@@ -1,0 +1,103 @@
+<include file="./Public/Webform/Nav/header.html" title="账号日志" />
+<div id="wrapper">
+    <include file="./Public/Webform/Nav/topnav.html" actuser="layui-this"/>
+    <include file="./Public/Webform/User/leftnav.html" actlog="class=layui-this"/>
+    <div class="layui-tab layui-tab-brief tab-div-withnav" lay-filter="usertab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">账号日志</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                    <legend>账号日志</legend>
+                </fieldset>
+                <div class="panel-footer div-footer-pages">
+                    <div id="user-log-page"></div>
+                </div>
+                <blockquote id="user-log-no-log" class="layui-elem-quote layui-hide">
+                    <div class="quote-content">
+                        暂无日志
+                    </div>
+                    <div class="quote-footer">
+                        <i class="glyphicon glyphicon-globe"></i>
+                        <span class="quote-push-time"><i class="glyphicon glyphicon-time"></i> </span>
+                    </div>
+                </blockquote>
+                <div id="user-log-show">
+                    <blockquote class="layui-elem-quote">
+                        <div class="quote-content">
+                            NULL
+                        </div>
+                        <div class="quote-footer">
+                            <i class="glyphicon glyphicon-globe"></i> NULL
+                            <span class="quote-push-time"><i class="glyphicon glyphicon-time"></i> NULL</span>
+                        </div>
+                    </blockquote>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/User/footer.html" />
+<script>
+    $(document).ready(function () {
+        loading.show();
+        $.post(user_api.log_pages, null, function (r) {
+            if(r.status == 1){
+                pagelist(location.hash.replace('#!page=', '') || 1, r.data);
+            }
+            if(r.status == 0){
+                loading.end();
+                msg.show('获取当前分页总数失败');
+                exit();
+            }
+        },'JSON');
+    });
+    function pagelist(curr, pages) {
+        loading.show();
+        var query = {"page": parseInt(curr) || 1};
+        $.post(user_api.log_list, query, function (r) {
+            if(r.status == 0){
+                loading.end();
+                msg.show(r.message);
+                exit();
+            }
+            if(r.status == 1){
+                loading.end();
+                var divbody = $('#user-log-show');
+                divbody.html("");
+                if(r.data.length == 0){
+                    $('#user-log-no-log').removeClass('layui-hide');
+                } else{
+                    var data = r.data;
+                    $.each(data, function (index, record) {
+                        divbody.append($('<blockquote class="layui-elem-quote"/>')
+                            .append($('<div class="quote-content"/>').html("#"+record.eventid+"<br />"+record.contents+"<br />"))
+                            .append($('<div class="quote-footer"/>').html('<i class="glyphicon glyphicon-globe"></i>'
+                                    +record.iprecord+'<span class="quote-push-time"><i class="glyphicon glyphicon-time"></i>'
+                                    +record.eventtime ))
+                        );
+                    });
+                }
+            }
+        },'JSON');
+        layui.use('laypage', function(){
+            var laypage = layui.laypage;
+            laypage({
+                cont: 'user-log-page'
+                ,pages: pages
+                ,curr: curr//获取hash值为fenye的当前页
+                ,hash: 'page' //自定义hash值
+                ,jump: function (e, first) {
+                    if(!first){
+                        pagelist(e.curr, e.pages);
+                    }
+                },
+                skip: true
+            });
+        });
+    }
+</script>

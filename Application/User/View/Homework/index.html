@@ -1,0 +1,96 @@
+<include file="./Public/Webform/Nav/header.html" title="我的小组" />
+<div id="wrapper">
+    <include file="./Public/Webform/Nav/topnav.html" actuser="layui-this"/>
+    <include file="./Public/Webform/User/leftnav.html" acthomework="class=layui-this"/>
+    <div class="layui-tab layui-tab-brief tab-div-withnav" lay-filter="usertab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">个人作业</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                    <legend>作业情况</legend>
+                </fieldset>
+                <div class="panel-footer div-footer-pages">
+                    <div id="user-group-pager"></div>
+                </div>
+                <div id="user-group-showlist">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">暂无作业</div>
+                        <div class="panel-body">
+                            <div class="user-panel-content">暂时还没有最新作业</div>
+                            <div><a href="javascript:;" class="layui-btn">查看详细</a></div>
+                        </div>
+                        <div class="panel-footer quote-footer">
+                            <i class="glyphicon glyphicon-user"></i> 发布作业者
+                            <span class="quote-push-time"><i class="glyphicon glyphicon-time"></i> 发布时间</span>
+                            <span class="quote-push-time"><i class="glyphicon glyphicon-alert"> </i>截止时间</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/User/footer.html" />
+<script>
+    $(document).ready(function () {
+        init.works();//初始化作业菜单
+    });
+    var init = {
+        works: function () {
+            $.post(user_api.hw_person_pages, null ,function (r) {
+                if(r.status == 1){
+                    pagelist(location.hash.replace('#!page=', '') || 1, r.data);
+                }
+                if(r.status == 0){
+                    msg.show('获取分页总数失败');
+                    exit();
+                }
+            },"JSON");
+        },
+    }
+    function pagelist(curr, pages) {
+        var query = {"page": parseInt(curr) || 1};
+        $.post(user_api.hw_person_list, query, function (r) {
+            if(r.status == 0){
+                msg.show('获取列表数据失败');
+                exit();
+            }
+            if(r.status == 1){
+                var tbody = $("#user-group-showlist");
+                tbody.html("");
+                var data = r.data;
+                $.each(data, function (index, record) {
+                    tbody.append('<div class="panel '+record.color+'">' +
+                        '<div class="panel-heading">#'+record.themeid+' - '+record.showname+'</div>' +
+                        '<div class="user-panel-content">内容：<br />'+record.thintro+'</div>' +
+                        '<div class="user-panel-content">参考文献：<br />'+record.references+'</div>' +
+                        '<div><a href="/user/homework/hand#;tid='+record.themeid+'" class="layui-btn">提交作业</a></div><br />' +
+                        '<div class="panel-footer quote-footer">' +
+                        '<i class="glyphicon glyphicon-user"></i> '+record.creatorid+'' +
+                        '<span class="quote-push-time"><i class="glyphicon glyphicon-time"></i> '+record.createtime+'</span>' +
+                        '<span class="quote-push-time"><i class="glyphicon glyphicon-alert"></i> '+record.deadline+'</span>' +
+                        '</div></div>');
+                });
+            }
+        },'JSON');
+        layui.use('laypage', function(){
+            var laypage = layui.laypage;
+            laypage({
+                cont: 'user-group-pager'
+                ,pages: pages
+                ,curr: curr//获取hash值为fenye的当前页
+                ,hash: 'page' //自定义hash值
+                ,jump: function (e, first) {
+                    if(!first){
+                        pagelist(e.curr, e.pages);
+                    }
+                },
+                skip: true
+            });
+        });
+    }
+</script>

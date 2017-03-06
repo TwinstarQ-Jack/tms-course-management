@@ -1,0 +1,242 @@
+<include file="./Public/Webform/Nav/header.html" title="添加新主题" />
+<link href="/Public/css/table-bootstrap.min.css" rel="stylesheet" type="text/css">
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" actthmnth="class=layui-this"/>
+    <div class="tab-div-withnav">
+        <div class="panel panel-default div-navtop"><div class="panel-heading">
+            您现在所处位置：
+            <span class="layui-breadcrumb">
+                <a href="/admin">后台首页</a>
+                <a href="/admin/theme/newchapter">添加新主题</a>
+            </span>
+        </div></div>
+        <div class="div-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <input type="hidden" name="tid" value="0"/>
+                    <div class="layui-form layui-form-pane" style="padding-top: 20px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">所属章</label>
+                            <div class="layui-input-block">
+                                <select name="chapterid" class="layui-form-select">
+                                    <option value="">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">主题类型</label>
+                            <div class="layui-input-block">
+                                <input type="radio" lay-filter="thtype" name="thtype" value="0" title="介绍类"/>
+                                <input type="radio" lay-filter="thtype" name="thtype" value="1" title="个人作业" />
+                                <input type="radio" lay-filter="thtype" name="thtype" value="2" title="集体作业" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">主题标题名</label>
+                            <div class="layui-input-block">
+                                <input class="layui-input" required lay-verify="required" type="text" name="showname" placeholder="Chapter Name" />
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                该字段为必填字段
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">英文标题名</label>
+                            <div class="layui-input-block">
+                                <input class="layui-input" type="text" name="engname" placeholder="Chapter English Name" />
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                选填
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">介绍</label>
+                            <div class="layui-input-block">
+                                <textarea class="layui-input" type="text" name="thintro" id="thintro" placeholder="Chapter Introduction in Chinese" style="height: 100px;" ></textarea>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                选填，如需要换行，请在需要换行处添加标记：&lt;br /&gt;（显示支持html标记）
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">参考文献</label>
+                            <div class="layui-input-block">
+                                <textarea class="layui-input" type="text" name="references" placeholder="References" style="height: 100px;"></textarea>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                选填，如需要换行，请在需要换行处添加标记：&lt;br /&gt;（显示支持html标记）
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item layui-hide" id="admin-theme-deadline">
+                            <label class="layui-form-label">截止时间</label>
+                            <div class="layui-input-inline">
+                                <input class="layui-input" name="deadline" placeholder="Deadline" id="admin-theme-date" />
+                            </div>
+                        </div>
+                </div>
+                    <div class="panel-footer div-footer-pages">
+                        <div>
+                            <a class="layui-btn" id="admin-theme-addsubmit">
+                                <i class="layui-icon">&#x1005;</i> 提交
+                            </a>
+                            <a class="layui-btn layui-hide" href="javascript:;" id="admin-theme-save">
+                                <i class="layui-icon">&#x1005;</i> 保存
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    $(document).ready(function () {
+        var tid = $.hash('id');
+        var del = $.hash('del');
+        var edit = $.hash('edit');
+        if(del == 1) {
+            layui.use('layer', function () {
+                var layer = layui.layer;
+                layer.open({
+                    skin: 'layui-layer-molv',
+                    content : '是否确定删除编号为'+tid+'的主题？删除后无法恢复',
+                    icon: 3,
+                    btn : ['是','否'],
+                    yes : function(){
+                        loading.show();
+                        $.post(admin_api.theme_theme_del, {'tid':tid}, function (r) {
+                            loading.end();
+                            if(r.status == 0) {
+                                return dialog.errorto(r.message, '/admin/hw/manager')
+                            }
+                            if(r.status == 1) {
+                                return dialog.success(r.message, '/admin/hw/manager')
+                            }
+                        },"JSON");
+                    },
+                    btn2 : function () {
+                        location.href = '/admin/hw/manager';
+                    },
+                });
+            });
+        }
+
+        layui.use(['laydate','form'], function () {
+            var laydate = layui.laydate
+                ,form = layui.form();
+            var datesetting = {
+                min: laydate.now()
+                , max: laydate.now(+145)
+                , istoday: false
+                , istime: true
+                , format: 'YYYY-MM-DD hh:mm:ss'
+            };
+            document.getElementById('admin-theme-date').onclick = function () {
+                datesetting.elem = this;
+                laydate(datesetting);
+            };
+            //填充所属章
+            $.post(admin_api.theme_chapter_get, null, function (r) {
+                if(r.status == 0){
+                    return dialog.error(r.message);
+                }
+                if(r.status == 1){
+                    var select = $('select[name="chapterid"]');
+                    $.each(r.data, function (index, object) {
+                        select.append("<option value="+object.chapterid+">"+object.showname+"</option>");
+                    });
+                    if(edit == 1) {
+                        loading.show();
+                        $.post(admin_api.theme_theme_content, {'tid':tid}, function (r) {
+                            if(r.status == 0){
+                                return dialog.errorto(r.message, '/admin/hw/manager');
+                            }
+                            if(r.status == 1){
+                                var data = r.data;
+                                $('select[name="chapterid"]').val(data.chapterid);
+                                switch(data.thtype){
+                                    case '0': $('input[name="thtype"]').eq(0).attr("checked", true);break;
+                                    case '1': $('input[name="thtype"]').eq(1).attr("checked", true);break;
+                                    case '2': $('input[name="thtype"]').eq(2).attr("checked", true);break;
+                                }
+                                form.render();
+                                $('input[name="showname"]').val(data.showname);
+                                $('input[name="engname"]').val(data.engname);
+                                $('input[name="deadline"]').val(data.deadline);
+                                $('textarea[name="thintro"]').text(data.thintro);
+                                $('textarea[name="references"]').text(data.references);
+                                $('#admin-theme-addsubmit').addClass('layui-hide');
+                                $('#admin-theme-save').removeClass('layui-hide');
+                                $('input[name="tid"]').val($.hash('id'));
+                                msg.show('获取成功');
+                            }
+                        },"JSON");
+                        loading.end();
+                    }
+                    form.render();
+                }
+            },"JSON");
+            form.on('radio(thtype)', function (data) {
+                if(data.value != 0){
+                    $('#admin-theme-deadline').removeClass('layui-hide');
+                } else{
+                    $('#admin-theme-deadline').addClass('layui-hide');
+                }
+            });
+        });
+    });
+    $('#admin-theme-save').click(function () {
+        loading.show();
+        var tid = $('input[name="tid"]').val();;
+        var chname = $('input[name="showname"]').val();
+        var engname = $('input[name="engname"]').val();
+        var thtype = $('input[name="thtype"]:checked').val();
+        var cid = $('select[name="chapterid"]').val();
+        var intro = $('textarea[name="thintro"]').val();
+        var refers = $('textarea[name="references"]').val();
+        var ddl = $('input[name="deadline"]').val();
+        public.isnull(tid, '修改的主题索引');
+        public.isnull(chname, '主题标题名');
+        public.isnull(thtype, '主题类型');
+        public.isnull(cid, '所属章');
+        var send = {'tid':tid, 'chname':chname, 'engname':engname, 'thtype':thtype
+        , 'cid':cid, 'intro':intro, 'refers':refers, 'ddl':ddl};
+        $.post(admin_api.theme_theme_save, send, function (r) {
+            loading.end();
+            if(r.status == 0){
+                return dialog.error(r.message);
+            }
+            if(r.status == 1){
+                return dialog.success(r.message, '/admin/hw/manager');
+            }
+        },"JSON");
+    });
+    $('#admin-theme-addsubmit').click(function () {
+        loading.show();
+        var chname = $('input[name="showname"]').val();
+        var engname = $('input[name="engname"]').val();
+        var thtype = $('input[name="thtype"]:checked').val();
+        var cid = $('select[name="chapterid"]').val();
+        var intro = $('textarea[name="thintro"]').val();
+        var refers = $('textarea[name="references"]').val();
+        var ddl = $('input[name="deadline"]').val();
+        public.isnull(chname, '主题标题名');
+        public.isnull(thtype, '主题类型');
+        public.isnull(cid, '所属章');
+        var send = {'chname':chname, 'engname':engname, 'thtype':thtype
+        , 'cid':cid, 'intro':intro, 'refers':refers, 'ddl':ddl};
+        $.post(admin_api.theme_theme_add, send, function (r) {
+            loading.end();
+            if(r.status == 0){
+                return dialog.error(r.message);
+            }
+            if(r.status == 1){
+                return dialog.success(r.message, '/admin/hw/manager');
+            }
+        },"JSON");
+    });
+</script>

@@ -1,0 +1,120 @@
+<include file="./Public/Webform/Nav/header.html" title="系统成员管理" />
+<link href="/Public/css/table-bootstrap.min.css" rel="stylesheet" type="text/css">
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" actusrmgr="class=layui-this"/>
+    <div class="tab-div-withnav">
+        <div class="panel panel-default div-navtop"><div class="panel-heading">
+            您现在所处位置：
+            <span class="layui-breadcrumb">
+                <a href="/admin">后台首页</a>
+                <a href="/admin/user/manage">成员管理</a>
+            </span>
+        </div></div>
+        <div class="div-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="div-area-funcbtn">
+                        <a class="layui-btn" id="admin-user-adduser">
+                            <i class="layui-icon">&#xe61f;</i> 添加新用户
+                        </a>
+                        <a class="layui-btn layui-btn-primary" id="admin-refresh">
+                            <i class="layui-icon">&#x1002;</i> 刷新
+                        </a>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead><tr>
+                            <td>一卡通</td>
+                            <td>姓名</td>
+                            <td>年级</td>
+                            <td>权限</td>
+                            <td>注册时间</td>
+                            <td>最近登录</td>
+                            <td>课程贡献</td>
+                            <td>操作</td>
+                        </tr></thead>
+                        <tbody id="admin-user-showlist">
+                        <tr>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>
+                                <a class="layui-btn td-btn"><i class="layui-icon">&#xe642;</i></a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="panel-footer div-footer-pages">
+                        <div id="admin-user-pager"></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    $(document).ready(function () {
+        $.post(admin_api.user_mgr_pages, null, function (r) {
+            if(r.status == 1){
+                pagelist(location.hash.replace('#!page=', '') || 1, r.data);
+            }
+            if(r.status == 0){
+                msg.show('获取分页总数失败');
+                exit();
+            }
+        },'JSON');
+
+    });
+    function pagelist(curr, pages) {
+        var query = {"page": parseInt(curr) || 1};
+        $.post(admin_api.user_mgr_list, query, function (r) {
+            if(r.status == 0){
+                msg.show('获取列表数据失败');
+                exit();
+            }
+            if(r.status == 1){
+                var tbody = $("#admin-user-showlist");
+                tbody.html("");
+                var data = r.data;
+                $.each(data, function (index, record) {
+                    tbody.append($('<tr/>')
+                        .append($('<td/>').html(record.cardid))
+                        .append($('<td/>').html(record.name))
+                        .append($('<td/>').html(record.grade))
+                        .append($('<td/>').html(record.rootrank))
+                        .append($('<td/>').html(record.regtime))
+                        .append($('<td/>').html(record.logintime))
+                        .append($('<td/>').html(record.credits))
+                        .append($('<td/>').html('<a class="layui-btn td-btn" href="/admin/user/adduser#;cid='+record.cardid
+                        +'"><i class="layui-icon">&#xe642;</i></a>'))
+                    );
+                });
+            }
+        },'JSON');
+        layui.use('laypage', function(){
+            var laypage = layui.laypage;
+            laypage({
+                cont: 'admin-user-pager'
+                ,pages: pages
+                ,curr: curr//获取hash值为fenye的当前页
+                ,hash: 'page' //自定义hash值
+                ,jump: function (e, first) {
+                    if(!first){
+                        pagelist(e.curr, e.pages);
+                    }
+                },
+                skip: true
+            });
+        });
+    }
+</script>

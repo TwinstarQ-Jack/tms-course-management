@@ -1,0 +1,232 @@
+<include file="./Public/Webform/Nav/header.html" title="小组管理" />
+<link href="/Public/css/table-bootstrap.min.css" rel="stylesheet" type="text/css">
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" actgromgr="class=layui-this"/>
+    <div class="tab-div-withnav">
+        <div class="panel panel-default div-navtop"><div class="panel-heading">
+            您现在所处位置：
+            <span class="layui-breadcrumb">
+                <a href="/admin">后台首页</a>
+                <a href="/admin/user/group">小组管理</a>
+            </span>
+        </div></div>
+        <div class="div-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="div-area-funcbtn layui-form layui-form-pane">
+                        <label class="layui-form-label">选择年级</label>
+                        <div class="layui-input-inline">
+                            <select name="rgrade" lay-filter="grade"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead><tr>
+                            <td>组号</td>
+                            <td>成员数</td>
+                            <td>组长</td>
+                            <td>成员</td>
+                        </tr></thead>
+                        <tbody id="admin-group-showlist">
+                        <tr>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="panel-footer div-footer-pages">
+                        <div id="admin-group-pager"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">小组相关设置</div>
+                <div class="panel-body">
+                    <div class="layui-form layui-form-pane">
+                        <fieldset class="layui-elem-field layui-field-title">
+                            <legend>开放注册设置</legend>
+                        </fieldset>
+                        <div class="layui-form-item label-nolimit">
+                            <label class="layui-form-label">开放组长注册小组</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" lay-filter="regleader" name="regleader" title="启用" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item label-nolimit">
+                            <label class="layui-form-label">开放成员加入小组</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" lay-filter="regmember" name="regmember" title="启用" />
+                            </div>
+                        </div>
+                    </div>
+                    <form id="admin-group-setting" class="layui-form layui-form-pane" method="post">
+                        <fieldset class="layui-elem-field layui-field-title">
+                            <legend>更改上限</legend>
+                        </fieldset>
+                        <div class="layui-form-item label-nolimit">
+                            <label class="layui-form-label">分组上限数目</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="groupslimit" required lay-verify="number" placeholder="Groups Limit" autocomplete="off" class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item label-nolimit">
+                            <label class="layui-form-label">小组成员上限数目</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="groupsmemberlimit" required lay-verify="number" placeholder="Members Limit" autocomplete="off" class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <button class="layui-btn" lay-filter="settingsubmit" lay-submit>提交上限更改</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    function savesettings(name, value, cname) {
+        $.post(admin_api.group_save_settings, {'name':name,'value':value,'cname':cname}
+        ,function (r) {
+            loading.end();
+            if(r.status == 0){
+                return dialog.error(r.message);
+            }
+            if(r.status == 1){
+                return dialog.toconfirm(r.message);
+            }
+        },"JSON");
+    }
+    $(document).ready(function () {
+        $.post(admin_api.nowgrade_get, null, function (r) {
+            if(r.status == 1){
+                init_grade(r.data);
+            }
+            if(r.status == 0){
+                msg.show(r.message);
+            }
+        },'JSON');
+
+        $.post(admin_api.group_init_settings, null, function (r) {
+            if(r.status == 0){
+                return msg(r.message);
+            }
+            if(r.status == 1){
+                var data = r.data;
+                if(data["regleader"] == 1){
+                    $('input[name="regleader"]').attr("checked", "checked");
+                }
+                if(data["regmember"] == 1){
+                    $('input[name="regmember"]').attr("checked", "checked");
+                }
+                layui.use('form', function () {
+                   layui.form().render();
+                });
+                $('input[name="groupslimit"]').val(data["groupslimit"]);
+                $('input[name="groupsmemberlimit"]').val(data["groupsmemberlimit"]);
+            }
+        },'JSON');
+        init_form();
+    });
+    function init_grade(year) {
+        loading.show();
+        var mydate = new Date();
+        var thisyear = mydate.getFullYear();
+        var select = $('select[name="rgrade"]');
+        for(var i = 2014; i <= (thisyear-2); i++) {
+            select.append("<option value="+i+">"+i+"</option>");
+        }
+        select.val(year);
+        init_pages(year);
+    }
+    function init_pages(year) {
+        $.post(admin_api.group_pages, {'grade': year}, function (r) {
+            if(r.status == 1){
+                pagelist(location.hash.replace('#!page=', '') || 1, r.data, year);
+            }
+            if(r.status == 0){
+                loading.end();
+                return msg.show('获取分页总数失败');
+            }
+        },'JSON');
+    }
+    function pagelist(curr, pages, year) {
+        loading.show();
+        var query = {"page": parseInt(curr) || 1,"grade": year};
+        $.post(admin_api.group_lists, query, function (r) {
+            loading.end();
+            if(r.status == 0){
+                return msg.show('获取列表数据失败');
+            }
+            if(r.status == 1){
+                var tbody = $("#admin-group-showlist");
+                tbody.html("");
+                var data = r.data;
+                $.each(data, function (index, record) {
+                    tbody.append($('<tr/>')
+                        .append($('<td/>').html(record.id))
+                        .append($('<td/>').html(record.num))
+                        .append($('<td/>').html(record.leader))
+                        .append($('<td/>').html(record.member))
+                    );
+                });
+            }
+        },'JSON');
+        layui.use('laypage', function(){
+            var laypage = layui.laypage;
+            laypage({
+                cont: 'admin-group-pager'
+                ,pages: pages
+                ,curr: curr//获取hash值为fenye的当前页
+                ,hash: 'page' //自定义hash值
+                ,jump: function (e, first) {
+                    if(!first){
+                        pagelist(e.curr, e.pages, year);
+                    }
+                },
+                skip: true
+            });
+        });
+    }
+    function init_form() {
+        layui.use('form', function () {
+            var form = layui.form();
+            //跳转查询年级
+            form.on('select(grade)', function (data) {
+                loading.show();
+                init_pages(data.value);
+                loading.end();
+            });
+            form.on('checkbox(regleader)', function (data) {
+                loading.show();
+                var value = (data.elem.checked) ? 1: 0;
+                savesettings('regleader', value, '开放组长注册小组设置为'+data.elem.checked);
+            });
+            form.on('checkbox(regmember)', function (data) {
+                loading.show();
+                var value = (data.elem.checked) ? 1: 0;
+                savesettings('regmember', value, '开放成员加入小组设置为'+data.elem.checked);
+            });
+            form.on('submit(settingsubmit)', function (data) {
+                loading.show();
+                $.post(admin_api.group_save_limits, {'data':data.field}, function (r) {
+                    loading.end();
+                    if(r.status == 0){
+                        return dialog.error(r.message);
+                    }
+                    if(r.status == 1){
+                        return dialog.toconfirm(r.message);
+                    }
+                },"JSON");
+                return false;
+            });
+        });
+    }
+
+</script>

@@ -1,0 +1,155 @@
+<include file="./Public/Webform/Nav/header.html" title="授权码添加" />
+<link href="/Public/css/table-bootstrap.min.css" rel="stylesheet" type="text/css">
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" actusrcod="class=layui-this"/>
+    <div class="tab-div-withnav">
+        <div class="panel panel-default div-navtop"><div class="panel-heading">
+            您现在所处位置：
+            <span class="layui-breadcrumb">
+                <a href="/admin">后台首页</a>
+                <a href="/admin/user/code">添加授权码</a>
+            </span>
+        </div></div>
+        <div class="div-container">
+            <div class="panel panel-primary">
+                <div class="panel-heading">添加新授权码</div>
+                <div class="panel-body">
+                    <form method="post" class="layui-form layui-form-pane">
+                        <div class="layui-form-item label-nolimit">
+                            <label class="layui-form-label">使用者一卡通号</label>
+                            <div class="layui-input-inline">
+                                <input class="layui-input" name="codecid" placeholder="User CardID" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item label-nolimit">
+                            <label class="layui-form-label">只知道姓名？</label>
+                            <div class="layui-input-inline">
+                                <a href="#" id="admin-sendmsg-search" class="layui-btn"><i class="layui-icon">&#xe607;</i> 点击查询</a>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                在弹出层进行查询
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <a id="admin-code-submit" class="layui-btn" href="javascript:;"><i class="layui-icon">&#xe616;</i> 创建新授权码</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="div-area-funcbtn">
+                        <a class="layui-btn layui-btn-primary" id="admin-refresh">
+                            <i class="layui-icon">&#x1002;</i> 刷新
+                        </a>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead><tr>
+                            <td>#</td>
+                            <td>授权码</td>
+                            <td>截止时间</td>
+                            <td>使用人</td>
+                            <td>创建者</td>
+                            <td>状态</td>
+                        </tr></thead>
+                        <tbody id="admin-code-showlist">
+                        <tr>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="panel-footer div-footer-pages">
+                        <div id="admin-code-pager"></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    $(document).ready(function () {
+        loading.show();
+        $.post(admin_api.code_pages, null, function (r) {
+            if(r.status == 1){
+                pagelist(location.hash.replace('#!page=', '') || 1, r.data);
+            }
+            if(r.status == 0){
+                loading.end();
+                msg.show('获取分页总数失败');
+                exit();
+            }
+        },'JSON');
+        loading.end();
+    });
+    function pagelist(curr, pages) {
+        var query = {"page": parseInt(curr) || 1};
+        $.post(admin_api.code_list, query, function (r) {
+            loading.end();
+            if(r.status == 0){
+                msg.show('获取列表数据失败');
+                exit();
+            }
+            if(r.status == 1){
+                var tbody = $("#admin-code-showlist");
+                tbody.html("");
+                var data = r.data;
+                $.each(data, function (index, record) {
+                    tbody.append($('<tr/>')
+                        .append($('<td/>').html(record.id))
+                        .append($('<td/>').html(record.codevalue))
+                        .append($('<td/>').html(record.deadline))
+                        .append($('<td/>').html(record.cardid))
+                        .append($('<td/>').html(record.creator))
+                        .append($('<td/>').html(record.status))
+                    );
+                });
+            }
+        },'JSON');
+        layui.use('laypage', function(){
+            var laypage = layui.laypage;
+            laypage({
+                cont: 'admin-code-pager'
+                ,pages: pages
+                ,curr: curr//获取hash值为fenye的当前页
+                ,hash: 'page' //自定义hash值
+                ,jump: function (e, first) {
+                    if(!first){
+                        pagelist(e.curr, e.pages);
+                    }
+                },
+                skip: true
+            });
+        });
+    }
+    $('#admin-code-submit').click(function () {
+       loading.show();
+       var cid = $('input[name="codecid"]').val();
+       if(cid == ""){
+           loading.end();
+           return dialog.error('一卡通号不能为空');
+       } else{
+           $.post(admin_api.code_add, {'cid':cid},function (r) {
+               loading.end();
+               if(r.status == 0){
+                   return dialog.error('添加授权码失败，错误为：'+r.message);
+               }
+               if(r.status == 1){
+                   return dialog.success('添加激活码成功', '/admin/user/code');
+               }
+           },"JSON");
+       }
+       loading.end();
+    });
+</script>

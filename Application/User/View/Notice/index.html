@@ -1,0 +1,154 @@
+<include file="./Public/Webform/Nav/header.html" title="消息中心" />
+<div id="wrapper">
+    <include file="./Public/Webform/Nav/topnav.html" actuser="layui-this"/>
+    <include file="./Public/Webform/User/leftnav.html" actnotice="class=layui-this"/>
+    <div class="layui-tab layui-tab-brief tab-div-withnav" lay-filter="usertab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">未读消息</li>
+            <li>已读信息</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                    <legend>未读消息列表</legend>
+                </fieldset>
+                <div class="panel-footer div-footer-pages">
+                    <div id="user-notice-pagecur"></div>
+                </div>
+                <blockquote class="layui-elem-quote layui-hide" id="user-notice-no-announce">
+                    暂时还没有未读信息
+                </blockquote>
+                <div id="user-notice-showcur">
+                    <blockquote class="layui-elem-quote">
+                        <div class="quote-content">
+                            已发布xxxx
+                        </div>
+                        <div class="quote-footer">
+                            <i class="glyphicon glyphicon-user"></i> 系统
+                            <span class="quote-push-time"><i class="glyphicon glyphicon-time"></i> 2016.08.12 03:56</span>
+                        </div>
+                    </blockquote>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                    <legend>已读消息列表</legend>
+                </fieldset>
+                <div class="panel-footer div-footer-pages">
+                    <div id="user-notice-pagehis"></div>
+                </div>
+                <blockquote class="layui-elem-quote layui-hide" id="user-notice-no-history">
+                    暂时还没有已读信息
+                </blockquote>
+                <div id="user-notice-showhis">
+                    <blockquote class="layui-elem-quote">
+                        <div class="quote-content">
+                            已发布xxxx
+                        </div>
+                        <div class="quote-footer">
+                            <i class="glyphicon glyphicon-user"></i> 系统
+                            <span class="quote-push-time"><i class="glyphicon glyphicon-time"></i> 2016.08.12 03:56</span>
+                        </div>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/User/footer.html" />
+<script>
+    $(document).ready(function () {
+        loading.show();
+        $.post(user_api.notice_pages, {'mode': "current"}, function (r) {
+            if(r.status == 1){
+                pagelist(location.hash.replace('#!pagecur=', '') || 1, r.data, 'current');
+            }
+            if(r.status == 0){
+                loading.end();
+                msg.show('获取当前分页总数失败');
+                exit();
+            }
+        },'JSON');
+        $.post(user_api.notice_pages, {'mode': "history"}, function (r) {
+            if(r.status == 1){
+                pagelist(location.hash.replace('#!pagehis=', '') || 1, r.data, 'history');
+            }
+            if(r.status == 0){
+                loading.end();
+                msg.show('获取历史分页总数失败');
+                exit();
+            }
+        },'JSON');
+    });
+    function pagelist(curr, pages, mode) {
+        loading.show();
+        var query = {"page": parseInt(curr) || 1, "mode": mode};
+        $.post(user_api.notice_list, query, function (r) {
+            if(r.status == 0){
+                msg.show(r.message);
+                exit();
+            }
+            if(r.status == 1){
+                var divbody = null;
+                if(mode == "current"){
+                    divbody = $('#user-notice-showcur');
+                }
+                if(mode == "history"){
+                    divbody = $('#user-notice-showhis');
+                }
+                divbody.html("");
+                if(r.data.length == 0){
+                    if(mode == "current"){
+                        $('#user-notice-no-announce').removeClass('layui-hide');
+                    }
+                    if(mode == "history"){
+                        $('#user-notice-no-history').removeClass('layui-hide');
+                    }
+                } else{
+                    var data = r.data;
+                    var insert = null;
+                    $.each(data, function (index, record) {
+                        if(mode == "current"){
+                            insert = '<a href="/user/notice/deal#;read=1;id='+record.pushid+'"><i class="glyphicon glyphicon-ok"></i> 标记已读</a>';
+                        }
+                        if(mode == "history"){
+                            insert = '<a href="/user/notice/deal#;read=0;id='+record.pushid+'"><i class="glyphicon glyphicon-remove"></i> 标记未读</a>';
+                        }
+                        divbody.append($('<blockquote class="layui-elem-quote"/>')
+                            .append($('<div class="quote-content"/>').html("#"+record.pushid+"<br />"+record.pushmessages+"<br />参考链接："+record.pushtourl))
+                            .append($('<div class="quote-footer"/>').html(insert+ '<span class="quote-push-time"><i class="glyphicon glyphicon-time"></i>'
+                                +record.pushtime ))
+                        );
+                    });
+                }
+                loading.end();
+            }
+        },'JSON');
+        layui.use('laypage', function(){
+            var laypage = layui.laypage;
+            var cont = null;
+            var hash = null;
+            if(mode == "current"){
+                cont = 'user-notice-pagecur';
+                hash = 'pagecur';
+            }
+            if(mode == "history"){
+                cont = 'user-notice-pagehis';
+                hash = 'pagehis';
+            }
+            laypage({
+                cont: cont
+                ,pages: pages
+                ,curr: curr//获取hash值为fenye的当前页
+                ,hash: hash //自定义hash值
+                ,jump: function (e, first) {
+                    if(!first){
+                        pagelist(e.curr, e.pages, mode);
+                    }
+                },
+                skip: true
+            });
+        });
+    }
+</script>

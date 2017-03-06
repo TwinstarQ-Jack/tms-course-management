@@ -1,0 +1,53 @@
+<include file="./Public/Webform/Nav/header.html" title="找回密码" />
+<div id="wrapper">
+    <include file="./Public/Webform/Nav/topnav.html"/>
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+        <legend>找回密码</legend>
+    </fieldset>
+    <div class="loginbox">
+        <form class="layui-form layui-form-pane" id="logincheck" method="post">
+            <div class="layui-form-item">
+                <label class="layui-form-label">一卡通卡号</label>
+                <div class="layui-input-inline">
+                    <input placeholder="Card Number" name="fcardaccount" type="text" class="layui-input" autofocus />
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <a href="/login/register">还未注册？</a>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <a class="layui-btn" style="width:100px;" id="fgetquestion" onclick="forget.getquestion();">获取问题</a>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">问题</label>
+                <div class="layui-input-block">
+                    <label class="layui-form-label" id="fshowquestion" style="width: auto;">请点击“获取问题”按钮获取</label>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">答案</label>
+                <div class="layui-input-inline">
+                    <input placeholder="Checking Answer" disabled="disabled" name="fanswer" type="text" class="layui-input"/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-input-inline">
+                    <input placeholder="Login Password" disabled="disabled" name="fpassword" type="password" class="layui-input"/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">重复密码</label>
+                <div class="layui-input-inline">
+                    <input placeholder="Login Password Again" disabled="disabled" name="fpassword2" type="password" class="layui-input" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <a class="layui-btn layui-btn-disabled" id="fresetpsw" style="width:110px;">重置账号</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<include file="./Public/Webform/Nav/footer.html" />
+<script src="/Public/js/login.js"></script>

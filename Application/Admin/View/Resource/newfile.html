@@ -1,0 +1,213 @@
+<include file="./Public/Webform/Nav/header.html" title="上传新资源" />
+<link href="/Public/css/table-bootstrap.min.css" rel="stylesheet" type="text/css">
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" actresnew="class=layui-this"/>
+    <div class="tab-div-withnav">
+        <div class="panel panel-default div-navtop"><div class="panel-heading">
+            您现在所处位置：
+            <span class="layui-breadcrumb">
+                <a href="/admin">后台首页</a>
+                <a href="/admin/resource/newfile">添加新资源</a>
+            </span>
+        </div></div>
+        <div class="div-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <input type="hidden" name="rchangestate" value="0"/>
+                    <input type="hidden" name="uploadurl" />
+                    <input type="hidden" name="uploadtype" />
+                    <div class="layui-form layui-form-pane" style="padding-top: 20px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">所属章</label>
+                            <div class="layui-input-block">
+                                <select name="chapterid" class="layui-form-select">
+                                    <option value="">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">文件标题名</label>
+                            <div class="layui-input-block">
+                                <input class="layui-input" required lay-verify="required" type="text" name="showname" placeholder="Chapter Name" />
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                该字段为必填字段
+                            </div>
+                        </div>
+                        <div class="layui-form-item" id="uploadnow">
+                            <label class="layui-form-label">上传资源</label>
+                            <div class="layui-input-block">
+                                <input class="layui-upload-file" type="file" name="resource" />
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                支持格式：pdf|doc|docx|xls|xlsx|ppt|pptm|pptx|zip，单文件大小<5M
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-hide" id="uploadfeedback">
+                            <label class="layui-form-label">文件信息</label>
+                            <div class="layui-input-block label-nolimit">
+                                <label class="layui-form-label">
+                                    上传文件名：<span id="upload_file_name"></span> |
+                                    文件大小： <span id="upload_file_size"></span>M
+                                </label>
+                            </div>
+                            <div class="layui-input-block" style="clear:left;">
+                                <a href="javascript:;" id="upload-cancel" class="layui-btn layui-btn-danger">取消本次上传</a>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">介绍</label>
+                            <div class="layui-input-block">
+                                <textarea class="layui-input" type="text" name="thintro" style="height: 100px;"></textarea>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                选填
+                            </div>
+                        </div>
+                </div>
+                    <div class="panel-footer div-footer-pages">
+                        <div>
+                            <a class="layui-btn" id="admin-resource-addsubmit">
+                                <i class="layui-icon">&#x1005;</i> 提交
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    layui.use(['upload','form'], function () {
+        var upload = layui.upload
+            ,form = layui.form();
+        //填充所属章
+        $.post(admin_api.theme_chapter_get, null, function (r) {
+            if(r.status == 0){
+                return dialog.error(r.message);
+            }
+            if(r.status == 1){
+                var select = $('select[name="chapterid"]');
+                $.each(r.data, function (index, object) {
+                    select.append("<option value="+object.chapterid+">"+object.showname+"</option>");
+                });
+                form.render();
+            }
+        },"JSON");
+        upload({
+           url: upload_api.upload_resource
+            ,title: '上传文件资源'
+            ,ext: 'pdf|doc|docx|xls|xlsx|ppt|pptx|zip'
+            ,type: 'file'
+            ,before: function () {
+                loading.show();
+            }
+            ,success:function (res) {
+                loading.end();
+                var data = res.data;
+                console.log(data);
+                if(res.status == 0){
+                    return dialog.error('上传失败，原因为：'+res.message);
+                }
+                if(res.status == 1){
+                    $('#uploadnow').addClass('layui-hide');
+                    $('input[name="uploadurl"]').val(data['src']);
+                    $('input[name="uploadtype"]').val(data['type']);
+                    $('input[name="rchangestate"]').val(1);
+                    $('#upload_file_name').text(data['name']);
+                    $('#upload_file_size').text(data['size'].toFixed(2));
+                    $('#uploadfeedback').removeClass('layui-hide');
+                    return dialog.toconfirm('上传成功，请提交以保存到数据库');
+                }
+            }
+        });
+    });
+
+    $('#admin-resource-addsubmit').click(function () {
+        loading.show();
+        var chname = $('input[name="showname"]').val();
+        var cid = $('select[name="chapterid"]').val();
+        var intro = $('textarea[name="thintro"]').val();
+        var upload = $('input[name="uploadurl"]').val();
+        var type = $('input[name="uploadtype"]').val();
+        public.isnull(chname, '主题标题名');
+        public.isnull(cid, '所属章');
+        var send = {'title':chname, 'cid':cid, 'intro':intro, 'file':upload, 'type':type};
+        $.post(admin_api.resource_save , send, function (r) {
+            loading.end();
+            if(r.status == 0){
+                return dialog.error(r.message);
+            }
+            if(r.status == 1){
+                return dialog.success(r.message, '/admin/resource/manager');
+            }
+        },"JSON");
+    });
+    $('#upload-cancel').click(function () {
+        layui.use('layer', function () {
+            var layer = layui.layer;
+            layer.open({
+                skin: 'layui-layer-molv',
+                content : '是否确认删除本条上传记录？删除后无法恢复',
+                icon: 3,
+                btn : ['是','否'],
+                yes : function(){
+                    loading.show();
+                    $.post(upload_api.dele_file, {'file':$('input[name="uploadurl"]').val()}, function (r) {
+                        loading.end();
+                        if(r.status == 0){
+                            return dialog.error(r.message);
+                        }
+                        if(r.status == 1){
+                            $('#uploadnow').removeClass('layui-hide');
+                            $('#uploadfeedback').addClass('layui-hide');
+                            $('input[name="uploadurl"]').val(null);
+                            $('input[name="uploadtype"]').val(null);
+                            $('#upload_file_name').text(null);
+                            $('#upload_file_size').text(null);
+                            $('input[name="rchangestate"]').val(0);
+                            return dialog.toconfirm(r.message);
+                        }
+                    },"JSON");
+                },
+            });
+        })
+    });
+    $(document).ready(function () {
+        var id = $.hash('id');
+        var del = $.hash('del');
+        if(del == 1) {
+            if(id == null) {
+                return dialog.errorto('没有删除的信息', '/admin/resource/manager');
+            } else {
+                layui.use('layer', function () {
+                   var layer = layui.layer;
+                   layer.open({
+                        skin: 'layui-layer-molv',
+                        content : '是否确定删除编号为'+id+'的资源文件？删除后无法恢复',
+                        icon: 3,
+                        btn : ['是','否'],
+                        yes : function(){
+                            loading.show();
+                            $.post(admin_api.resource_del, {'id':id}, function (r) {
+                                loading.end();
+                                if(r.status == 0) {
+                                    return dialog.errorto(r.message, '/admin/resource/manager')
+                                }
+                                if(r.status == 1) {
+                                    return dialog.success(r.message, '/admin/resource/manager')
+                                }
+                            },"JSON");
+                        },
+                        btn2 : function () {
+                            location.href = '/admin/resource/manager';
+                        },
+                });
+                });
+            }
+        }
+    });
+</script>

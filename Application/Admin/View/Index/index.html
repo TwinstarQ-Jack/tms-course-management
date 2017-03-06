@@ -1,0 +1,81 @@
+<include file="./Public/Webform/Nav/header.html" title="课程后台管理" />
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" actindex="layui-this"/>
+    <div class="layui-tab layui-tab-brief tab-div-withnav" lay-filter="usertab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">后台功能介绍</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+
+                <fieldset class="layui-elem-field">
+                    <legend>通知公告</legend>
+                    <div class="layui-field-box fieldset-content">
+                        通知公告模块包括：
+                        <ul>
+                            <li>发送课程公告</li>
+                            <li>对指定的用户发送提醒（目前只支持单个用户的发送）</li>
+                        </ul>
+                    </div>
+                </fieldset>
+                <fieldset class="layui-elem-field">
+                    <legend>学生管理</legend>
+                    <div class="layui-field-box fieldset-content">
+                        学生管理模块包括：
+                        <ul>
+                            <li>添加新的用户账号</li>
+                            <li>编辑指定用户的账号资料（包括密码、权限等）</li>
+                            <li>添加授权码（用于学生在前台管理修改自己账户的找回问题和密码，可以设定授权码的有效时间）</li>
+                        </ul>
+                    </div>
+                </fieldset>
+                <fieldset class="layui-elem-field">
+                    <legend>主题维护</legend>
+                    <div class="layui-field-box fieldset-content">
+                        主题维护模块包括：
+                        <ul>
+                            <li>添加新的章（单元）</li>
+                            <li>在已有章的基础上添加新的主题（节）</li>
+                            <li>管理已经创建的章、主题</li>
+                        </ul>
+                    </div>
+                </fieldset>
+                <fieldset class="layui-elem-field">
+                    <legend>作业管理</legend>
+                    <div class="layui-field-box fieldset-content">
+                        作业管理模块包括：
+                        <ul>
+                            <li>布置作业（单人形式完成、小组形式完成）</li>
+                            <li>管理已经布置的作业（编辑发布信息、作业deadline）</li>
+                            <li>查看学生已经上交的作业（拟支持在线查看，暂时不支持打包下载，打包目前预计采用ftp模式开放）</li>
+                        </ul>
+                    </div>
+                </fieldset>
+                <fieldset class="layui-elem-field">
+                    <legend>资源管理</legend>
+                    <div class="layui-field-box fieldset-content">
+                        资源管理模块包括：
+                        <ul>
+                            <li>为已经创建的主题上传对应的资源（必须要有主题才可以上传）</li>
+                            <li>管理已经上传的资源</li>
+                        </ul>
+                    </div>
+                </fieldset>
+                <fieldset class="layui-elem-field">
+                    <legend>关于讨论</legend>
+                    <div class="layui-field-box fieldset-content">
+                        讨论目前作为一个独立的板块，相关管理选项集成在前台的讨论板块中，不需要后台管理。
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    $(document).ready(function () {
+
+    })
+</script>

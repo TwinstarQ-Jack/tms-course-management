@@ -1,0 +1,157 @@
+<include file="./Public/Webform/Nav/header.html" title="课程公告" />
+<link href="/Public/css/table-bootstrap.min.css" rel="stylesheet" type="text/css">
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" actnotcou="class=layui-this"/>
+    <div class="tab-div-withnav">
+        <div class="panel panel-default div-navtop"><div class="panel-heading">
+            您现在所处位置：
+            <span class="layui-breadcrumb">
+                <a href="/admin">后台首页</a>
+                <a href="/admin/notice/course">课程公告</a>
+                <a href="/admin/notice/add">添加/修改公告</a>
+            </span>
+        </div></div>
+        <div class="div-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="div-area-funcbtn">
+                        <a class="layui-btn layui-btn-primary" href="/admin/notice/course">
+                            <i class="layui-icon">&#xe603;</i> 返回
+                        </a>
+                    </div>
+                    <input type="hidden" id="rchangestate" value="0"/>
+                    <div class="layui-form layui-form-pane" style="padding-top: 20px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">公告内容</label>
+                            <div class="layui-input-block">
+                                <textarea class="layui-textarea layui-hide" name="content" lay-verify="content" id="admin-notice-editor"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">保存内容</label>
+                            <div class="layui-input-inline">
+                                <button class="layui-btn site-layedit" data-type="content">保存编辑器内容</button>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                每次修改完内容均需要点击保存内容
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">跳转URL</label>
+                            <div class="layui-input-block">
+                                <input class="layui-input" type="text" name="jumpto" placeholder="Destination URL(若无，可以留空)" />
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                eg: http://tms.tqinit.com/course/3
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">有效期至</label>
+                            <div class="layui-input-inline">
+                                <input class="layui-input" placeholder="Msg Deadline" id="admin-notice-date"/>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                eg: 2017-02-09 11:11:01
+                            </div>
+                        </div>
+                </div>
+                    <div class="panel-footer div-footer-pages">
+                        <div>
+                            <a class="layui-btn layui-hide" href="javascript:;" id="admin-notice-addsubmit">
+                                <i class="layui-icon">&#x1005;</i> 提交
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    function initChange(id) {
+        $.post(admin_api.notice_read, {'id':id}, function (r) {
+            if(r.status == 1){
+                var data = r.data;
+                $('#rchangestate').val(1);
+                $('#admin-notice-editor').html(data['annomessages']);
+                $('input[name="sendmsg-jumpto"]').val(data['annotourl']);
+                $('#admin-notice-date').val(data['annodeadline']);
+            }
+            if(r.status == 0){
+                msg.show('获取指定id文章失败');
+            }
+        },'JSON');
+    }
+    $(document).ready(function () {
+        if($.hash("id")){
+            initChange($.hash("id"));
+            if($.hash("del") == 1){
+                layui.use('layer',function () {
+                    var layer = layui.layer;
+                    layer.open({
+                        skin: 'layui-layer-molv',
+                        content : '是否确认删除id=' +$.hash("id") +'的记录<br />（注意：该操作不可逆，不可恢复）',
+                        icon: 3,
+                        btn : ['是','否'],
+                        yes : function(){
+                            $.post(admin_api.notice_del, {"id":$.hash("id")}, function (r) {
+                                if(r.status == 1){
+                                    dialog.success('删除成功', '/admin/notice/course');
+                                }
+                                if(r.status == 0){
+                                    dialog.error('删除失败');
+                                }
+                            },'JSON')
+                        },
+                        btn2 : function () {
+                            location.href = '/admin/notice/course';
+                        }
+                    });
+                });
+            }
+        };
+    });
+    window.onload = function () {
+        layui.use('layedit',function () {
+            var layedit = layui.layedit;
+            var editIndex = layedit.build('admin-notice-editor', {
+                tool: ['strong', 'italic', 'underline', 'del', '|', 'face', 'link', 'unlink', '|', 'left', 'center', 'right']
+                ,height: 300
+            });
+            var active = {
+                content: function () {
+                    loading.show();
+                    $('#admin-notice-editor').text(layedit.getContent(editIndex)); //获取编辑器内容
+                    loading.end();
+                    if($('#admin-notice-editor').text() == "" || $('#admin-notice-editor').text() == null){
+                        msg.show('您的公告内容为空，必须填写');
+                    } else{
+                        msg.show('保存完毕，现在可以提交了');
+                        $('#admin-notice-addsubmit').removeClass('layui-hide');
+                    }
+                },
+            };
+            $('.site-layedit').on('click', function(){
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+        });
+    };
+    layui.use('laydate', function () {
+        var laydate = layui.laydate;
+        var datesetting = {
+            min: laydate.now()
+            , max: laydate.now(+145)
+            , istoday: false
+            , istime: true
+            , format: 'YYYY-MM-DD hh:mm:ss'
+        };
+        document.getElementById('admin-notice-date').onclick = function () {
+            datesetting.elem = this;
+            laydate(datesetting);
+        }
+    });
+</script>

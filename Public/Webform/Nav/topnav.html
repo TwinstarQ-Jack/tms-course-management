@@ -1,0 +1,85 @@
+
+    <nav class="layui-header">
+        <a class="layui-main nav-logo" href="/"></a>
+        <ul class="layui-nav nav-top-left pc-nav">
+            <li class="layui-nav-item [actuser]">
+                <a href="/user">首页</a>
+            </li>
+            <li class="layui-nav-item [actcourse]">
+                <a href="/course">课程资源</a>
+            </li>
+            <li class="layui-nav-item tms-ready [actdiscuss]">
+                <a href="/discuss">讨论</a>
+            </li>
+            <li class="layui-nav-item tms-ready [actabout]">
+                <a href="/home/about.html">关于</a>
+            </li>
+        </ul>
+        <ul class="layui-nav nav-top-right pc-nav">
+            <li class="layui-nav-item layui-hide" id="navmenu">
+                <a href="javascript:;">
+                    <i class="layui-icon">&#xe612;</i>
+                    <span id="username"></span>
+                </a>
+                <dl class="layui-nav-child nav-child-right">
+                    <dd><a href="javascript:;" id="navloginout">退出系统</a></dd>
+                    <dd><a href="/user/log">操作记录</a></dd>
+                    <dd><a href="/user/account">修改资料</a></dd>
+                    <dd><a href="/user/group" id="navgroup">我的小组</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item layui-hide" id="navmsgnum">
+                <a href="/user/notice">
+                    <i class="layui-icon">&#xe63a;</i> 消息<span class="badge" id="navshownum">0</span>
+                </a>
+            </li>
+            <li class="layui-nav-item layui-hide" id="navadmin">
+                <a href="/admin">
+                    <i class="layui-icon">&#xe614;</i> 后台入口
+                </a>
+            </li>
+            <li class="layui-nav-item" id="navlogin">
+                <a href="/login">登录</a>
+            </li>
+            <li class="layui-nav-item" id="navregister">
+                <a href="/login/register.html">注册</a>
+            </li>
+        </ul>
+        <ul class="layui-nav nav-top-right" id="mobile-nav">
+            <li class="layui-nav-item">
+                <a href="javascript:;"><i class="layui-icon">&#xe62e;</i> 模块</a>
+                <dl class="layui-nav-child nav-child-right">
+                    <dd><a href="/user">首页</a></dd>
+                    <dd><a href="/course">资源</a></dd>
+                    <dd><a href="/discuss">讨论</a></dd>
+                    <dd><a href="/home/about.html">关于</a></dd>
+                    <dd><a href="/feedback">反馈</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item">
+                <a href="javascript:;">
+                    <i class="layui-icon">&#xe612;</i> <span id="mobile-username"></span>
+                </a>
+                <dl class="layui-nav-child nav-child-right">
+                    <span id="mobile-nologin">
+                        <dd><a href="/login">登录</a></dd>
+                        <dd><span id="mobile-navregister"><a href="/login/register.html">注册</a></dd>
+                    </span>
+                    <span id="mobile-logined" class="layui-hide">
+                        <dd><a href="javascript:;" id="mobile-navloginout">退出系统</a></dd>
+                        <dd><a href="/user/log">操作记录</a></dd>
+                        <dd><a href="/user/account">修改资料</a></dd>
+                        <dd><a href="/user/group" id="mobile-navgroup">我的小组</a></dd>
+                    </span>
+                    <span id="mobile-admin" class="layui-hide">
+                        <dd><a href="/admin">管理后台</a></dd>
+                    </span>
+                </dl>
+            </li>
+            <li class="layui-nav-item layui-hide" id="mobile-navmsgnum">
+                <a href="/user/notice">
+                    <i class="layui-icon">&#xe63a;</i> <span class="badge" id="mobile-navshownum">0</span>
+                </a>
+            </li>
+        </ul>
+    </nav>

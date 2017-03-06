@@ -1,0 +1,36 @@
+<include file="./Public/Webform/Nav/header.html" title="课程资源" />
+<div id="wrapper">
+    <include file="./Public/Webform/Nav/topnav.html" actcourse="layui-this"/>
+    <div class="panel panel-primary course-ul">
+        <div class="panel-heading" id="readheader"></div>
+        <div class="panel-body" id="readintro"></div>
+        <div class="panel-footer quote-footer">
+            <i class="glyphicon glyphicon-user"></i> <span id="user"></span>
+            <span class="quote-push-time">
+                <i class="glyphicon glyphicon-time"></i> <span id="time"></span>
+            </span>
+        </div>
+    </div>
+</div>
+<include file="./Public/Webform/Nav/footer.html" />
+<script>
+    $(document).ready(function () {
+        var tid = $.hash('tid');
+        init(tid);
+    });
+    function init(tid) {
+        $.post(course_api.theme_intro_detail, {'tid':tid}, function (r) {
+            if(r.status == 0) {
+                return dialog.error('读取内容失败');
+            }
+            if(r.status == 1) {
+                var d = r.data;
+                $('#readheader').html('#'+d.chapterid+'&nbsp;&nbsp;'+d.showname+'&nbsp;&nbsp;'+d.engname);
+                $('#readintro').append(d.thintro);
+                $('#readintro').append('<br />参考文献：'+d.references);
+                $('#user').html(d.creatorid);
+                $('#time').html(d.createtime);
+            }
+        },"JSON");
+    }
+</script>

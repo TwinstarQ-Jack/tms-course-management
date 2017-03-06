@@ -1,0 +1,43 @@
+<include file="./Public/Webform/Nav/header.html" title="登录页" />
+<div id="wrapper">
+    <include file="./Public/Webform/Nav/topnav.html"/>
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+        <legend>登录系统</legend>
+    </fieldset>
+    <div class="loginbox">
+        <form class="layui-form layui-form-pane" id="logincheck" method="post">
+            <div class="layui-form-item">
+                <label class="layui-form-label">学号</label>
+                <div class="layui-input-inline">
+                    <input placeholder="Card Number" name="lcardaccount" type="text" class="layui-input" autofocus />
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <a href="/login/register">还未注册？</a>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-input-inline">
+                    <input placeholder="Login Password" name="lpassword" type="password" class="layui-input" />
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <a href="/login/forget">忘记密码？</a>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <a class="layui-btn" style="width:100px;" onclick="login.check();">登录</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<include file="./Public/Webform/Nav/footer.html" />
+<script src="/Public/js/login.js"></script>
+<script>
+    if($.hash('rank') == 0){
+        dialog.error('您的账号已被管理员封禁，无法使用，有疑问请咨询系统管理员或老师。');
+    }
+    if($.hash('user') == 0){
+        dialog.error('该功能登录后才能使用。');
+    }
+</script>

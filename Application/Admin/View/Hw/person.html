@@ -1,0 +1,114 @@
+<include file="./Public/Webform/Nav/header.html" title="个人作业状态" />
+<link href="/Public/css/table-bootstrap.min.css" rel="stylesheet" type="text/css">
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" acthwgrou="class=layui-this"/>
+    <div class="tab-div-withnav">
+        <div class="panel panel-default div-navtop"><div class="panel-heading">
+            您现在所处位置：
+            <span class="layui-breadcrumb">
+                <a href="/admin">后台首页</a>
+                <a href="/admin/hw/personlist">个人作业列表</a>
+                <a href="javascript:;">个人作业上交情况</a>
+            </span>
+        </div></div>
+        <div class="div-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="div-area-funcbtn">
+                        <a class="layui-btn layui-btn-primary" href="/admin/hw/personlist">
+                            <i class="layui-icon">&#xe603;</i> 返回
+                        </a>
+                        <a class="layui-btn" id="hw_url">
+                            <i class="layui-icon">&#xe60a;</i> 查看作业要求
+                        </a>
+                    </div>
+                    <span>
+                        当前显示作业：<span id="hw"></span>
+                    </span>
+                    <div>
+                        未提交成员：<span id="noupload"></span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead><tr>
+                            <td>#</td>
+                            <td>姓名</td>
+                            <td>上传时间</td>
+                            <td>下载</td>
+                        </tr></thead>
+                        <tbody id="admin-personhw-showlist">
+                        <tr>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>
+                                <a class="layui-btn td-btn"><i class="layui-icon">&#x1006;</i></a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="panel-footer div-footer-pages">
+                        <div id="admin-personhw-pager"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    $(document).ready(function () {
+        var tid = $.hash('tid');
+        if(tid == null || tid == "") {
+            return dialog.errorto('未定义操作', '/admin/hw/personlist');
+        }
+        $('#hw').text(tid);
+        $.post(admin_api.hw_person_tid_handin, {'tid':tid}, function (r) {
+            if(r.status == 1) {
+                var d = r.data;
+                var tbody = $('#admin-personhw-showlist');
+                tbody.html("");
+                $.each(d, function (index, obj) {
+                    if(obj.count > 0) {
+                        tbody.append($('<tr />')
+                            .append($('<td />').html(obj.cardid))
+                            .append($('<td />').html(obj.name))
+                            .append($('<td />').html(obj.details.handintime))
+                            .append($('<td />').append('<a class="layui-btn td-btn" href="'+obj.details.filename+'">' +
+                                '<i class="layui-icon">&#xe61e;</i></a>'))
+                        );
+                    } else {
+                        tbody.append($('<tr />')
+                            .append($('<td />').html(obj.cardid))
+                            .append($('<td />').html(obj.name))
+                            .append($('<td colspan="2"/>').html('无上传记录'))
+                        );
+                    }
+                });
+                $('#noupload').html(r.message);
+            }
+            if(r.status == 0) {
+                return dialog.error('获取作业'+tid+'详细信息失败');
+            }
+        },"JSON");
+    });
+    $('#hw_url').click(function () {
+        var tid = $.hash('tid');
+        layui.use('layer', function () {
+            var layer = layui.layer;
+            layer.open({
+                type: 2,
+                title: '查看作业要求',
+                shadeClose: true,
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['893px', '600px'],
+                content: '/user/homework/hand#;tid='+tid
+            });
+        })
+    });
+
+</script>

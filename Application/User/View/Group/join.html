@@ -1,0 +1,223 @@
+<include file="./Public/Webform/Nav/header.html" title="加入小组" />
+<div id="wrapper">
+    <include file="./Public/Webform/Nav/topnav.html" actuser="layui-this"/>
+    <include file="./Public/Webform/User/leftnav.html" actgroup="class=layui-this"/>
+    <div class="layui-tab layui-tab-brief tab-div-withnav" lay-filter="usertab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">系统情况</li>
+            <li>我是组长</li>
+            <li>我是组员</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                    <legend>系统开放情况</legend>
+                </fieldset>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">小组相关设置</div>
+                    <div class="panel-body">
+                        <div class="layui-form layui-form-pane">
+                            <fieldset class="layui-elem-field layui-field-title">
+                                <legend>开放注册设置</legend>
+                            </fieldset>
+                            <div class="layui-form-item label-nolimit">
+                                <label class="layui-form-label">开放组长注册小组</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="regleader" title="启用" />
+                                </div>
+                            </div>
+                            <div class="layui-form-item label-nolimit">
+                                <label class="layui-form-label">开放成员加入小组</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="regmember" title="启用" />
+                                </div>
+                            </div>
+                        </div>
+                        <fieldset class="layui-elem-field layui-field-title">
+                            <legend>上限设置</legend>
+                        </fieldset>
+                        <div class="layui-form-item label-nolimit">
+                            <label class="layui-form-label">分组上限数目</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="groupslimit" disabled class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item label-nolimit">
+                            <label class="layui-form-label">小组成员上限数目</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="groupsmemberlimit" disabled class="layui-input" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="layui-tab-item">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                    <legend>系统情况</legend>
+                </fieldset>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">小组情况</div>
+                    <div class="panel-body layui-form layui-form-pane">
+                        <div class="layui-form-item label-nolimit">
+                            <label class="layui-form-label">开放组长注册小组</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="regleader" title="启用" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item label-nolimit">
+                            <label class="layui-form-label">系统限制小组上限</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="groupslimit" disabled class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item label-nolimit">
+                            <label class="layui-form-label">已经注册的小组数</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="groupsreg" disabled class="layui-input" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                    <legend>申请通道</legend>
+                </fieldset>
+                <div>
+                    <button id="user-join-group-reg" disabled="disabled" class="layui-btn layui-disabled">
+                        <i class="layui-icon">&#xe61f;</i> 注册
+                    </button>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                    <legend>系统情况</legend>
+                </fieldset>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">小组成员情况</div>
+                    <div class="panel-body layui-form layui-form-pane">
+                        <div class="layui-form-item label-nolimit">
+                            <label class="layui-form-label">开放成员加入小组</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="regmember" title="启用" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item label-nolimit">
+                            <label class="layui-form-label">小组成员上限</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="groupsmemberlimit" disabled class="layui-input" />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                    <legend>申请通道</legend>
+                </fieldset>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">小组号</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="userjoinmembergid" autocomplete="false" placeholder="Group ID" class="layui-input" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <button id="user-join-member-reg" disabled="disabled" class="layui-btn layui-disabled">
+                        <i class="layui-icon">&#xe61f;</i> 加入小组
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/User/footer.html" />
+<script>
+    $(document).ready(function () {
+        loading.show();
+        $.post(admin_api.group_init_settings, null, function (r) {
+            if(r.status == 0){
+                loading.end();
+                return msg(r.message);
+            }
+            if(r.status == 1){
+                var data = r.data;
+                if(data["regleader"] == 1){
+                    $('input[name="regleader"]').attr("checked", "checked");
+                    $('#user-join-group-reg').removeClass('layui-disabled');
+                    $('#user-join-group-reg').attr('disabled', null);
+                }
+                if(data["regmember"] == 1){
+                    $('input[name="regmember"]').attr("checked", "checked");
+                    $('#user-join-member-reg').removeClass('layui-disabled');
+                    $('#user-join-member-reg').attr('disabled', null);
+                }
+                $('input[name="groupslimit"]').val(data["groupslimit"]);
+                $('input[name="groupsmemberlimit"]').val(data["groupsmemberlimit"]);
+            }
+        },"JSON");
+        $.post(user_api.terms_getnum, null, function (r) {
+            if(r.status == 0){
+                loading.end();
+                return msg(r.message);
+            }
+            if(r.status == 1){
+                loading.end();
+                $('input[name="groupsreg"]').val(r.data);
+            }
+        },"JSON");
+    });
+    layui.use('form', function () {
+        var form = layui.form();
+        form.render();
+    })
+    $('#user-join-group-reg').click(function () {
+        loading.show();
+       $.post(user_api.terms_reg_leader, null, function (r) {
+           loading.end();
+           if(r.status == 0){
+               return dialog.error(r.message);
+           }
+           if(r.status == 1){
+               return dialog.success(r.message, '/user/group');
+           }
+       },"JSON");
+    });
+    $('#user-join-member-reg').click(function () {
+        loading.show();
+        var gid = $('input[name="userjoinmembergid"]').val();
+        $.post(user_api.terms_get_member, {'gid':gid}, function (r) {
+            loading.end();
+            if(r.status == 0){
+                return dialog.error(r.message);
+            }
+            if(r.status == 1){
+                var message = '<p>获取成功，'+gid+'内成员有：</p>';
+                $.each(r.data, function (index, obj) {
+                    message += ('<p>'+obj.cardid+':'+obj.name+'</p>');
+                });
+                message += ('<p>是否确认进入该组？</p>');
+                layui.use('layer', function () {
+                    var layer = layui.layer;
+                    layer.open({
+                        skin: 'layui-layer-molv',
+                        content : message,
+                        icon: 3,
+                        btn : ['马上加入','容我三思'],
+                        yes : function(index, layero){
+                            layer.close(index);
+                            loading.show();
+                            $.post(user_api.terms_join_group, {'gid':gid}, function (r) {
+                                loading.end();
+                                if(r.status == 0){
+                                    return dialog.error(r.message);
+                                }
+                                if(r.status == 1) {
+                                    return dialog.success(r.message, '/user/group');
+                                }
+                            },"JSON");
+                        },
+                    });
+                })
+            }
+        },"JSON");
+    })
+</script>

@@ -1,0 +1,22 @@
+    <div class="layui-side layui-bg-black nav-sidebar">
+        <div class="layui-side-scroll">
+            <ul class="layui-nav layui-nav-tree" lay-filter="lefttree">
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="javascript:;" href="javascript:;">个人中心</span></a>
+                    <dl class="layui-nav-child">
+                        <dd [actindex]><a href="/user"><i class="fa fa-user fa-fw"></i> 个人中心</a></dd>
+                        <dd [actaccount]><a href="/user/account"><i class="fa fa-copy fa-fw"></i> 资料维护</a></dd>
+                        <dd [actnotice]><a href="/user/notice"><i class="fa fa-comment fa-fw"></i> 消息中心</a></dd>
+                        <dd [actlog]><a href="/user/log"><i class="fa fa-book fa-fw"></i> 账号日志</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a href="javascript:;">课程作业</a>
+                    <dl class="layui-nav-child">
+                        <dd [actgroup]><a href="/user/group"><i class="fa fa-group fa-fw"></i> 小组作业</a></dd>
+                        <dd [acthomework]><a href="/user/homework"><i class="fa fa-user fa-fw"></i> 个人作业</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>

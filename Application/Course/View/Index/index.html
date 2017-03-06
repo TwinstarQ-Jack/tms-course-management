@@ -1,0 +1,123 @@
+<include file="./Public/Webform/Nav/header.html" title="课程资源" />
+<div id="wrapper">
+    <include file="./Public/Webform/Nav/topnav.html" actcourse="layui-this"/>
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+        <legend>导航</legend>
+    </fieldset>
+    <fieldset class="layui-elem-field course-ul">
+        <legend>章节</legend>
+        <ul id="initnav"></ul>
+    </fieldset>
+    <div class="layui-elem-quote course-ul">
+        当前选择： <span id="initchoose"></span>
+    </div>
+    <div class="layui-elem-quote course-ul">
+        <fieldset class="layui-elem-field layui-field-title">
+            <legend>查阅资料</legend>
+        </fieldset>
+        <ul id="inittheme"></ul>
+    </div>
+    <div class="layui-elem-quote course-ul">
+        <fieldset class="layui-elem-field layui-field-title">
+            <legend>下载专区</legend>
+        </fieldset>
+        <ul id="initresource"></ul>
+    </div>
+
+</div>
+<include file="./Public/Webform/Nav/footer.html" />
+<script>
+    $(document).ready(function () {
+        init.initlist();
+        init.initall();
+    });
+    var init = {
+        initall : function () {
+            loading.show();
+            var cid = $.hash('cid');
+            if(cid != null && cid != "") {
+                $('#initchoose').html(cid);
+                init.initContent(cid);
+            }
+            loading.end();
+        },
+        initlist : function () {
+            //初始化章节fieldset
+            $.post(course_api.chapter_list, null, function (r1) {
+                if(r1.status == 0){
+                    return dialog.error('获取系统存在的单元失败');
+                }
+                if(r1.status == 1){
+                    var d1 = r1.data;
+                    var div = $('#initnav');
+                    $.each(d1, function (index1, obj1) {
+                        div.append($('<li />')
+                            .append('<a href="/course#;cid='+obj1.chapterid+'" class="urljump">'+obj1.chapterid+'-'+obj1.showname+'</a>')
+                        );
+                    });
+                }
+            },"JSON")
+        },
+        initContent: function (cid) {
+            //加载查阅资料区
+            $.post(course_api.theme_intro_list, {'cid':cid}, function (r2) {
+                if(r2.status == 0){
+                    loading.end();
+                    return msg.show('获取主题介绍失败');
+                }
+                if(r2.status == 1){
+                    var d2 = r2.data;
+                    var div = $('#inittheme');
+                    div.html("");
+                    $.each(d2, function (index2, obj2) {
+                       div.append($('<li />')
+                           .append('<a class="layui-btn read" href=/course/index/read#;tid='+obj2.themeid+'>' +
+                               '<i class="layui-icon">&#xe63a;</i></a>')
+                           .append(obj2.showname+','+obj2.creatorid+','+obj2.createtime)
+                       );
+                    });
+                }
+            },"JSON");
+            //加载下载专区
+            $.post(course_api.resource_list, {'cid':cid}, function (r3) {
+                if(r3.status == 0){
+                    loading.end();
+                    return msg.show('获取资源列表失败');
+                }
+                if(r3.status == 1){
+                    var d3 = r3.data;
+                    var div = $('#initresource');
+                    div.html("");
+                    $.each(d3, function (index3, obj3) {
+                        div.append($('<li />')
+                            .append('<a class="layui-btn" href='+obj3.filename+'>' +
+                                '<i class="layui-icon">&#xe601;</i></a>')
+                            .append(obj3.showname+'<br />文件介绍：'+obj3.remarks+'<br />'
+                                +obj3.uploaderid+','+obj3.uploadertime)
+                        );
+                    });
+                }
+            },"JSON");
+        }
+    };
+    $(document).on('click', '.urljump', function () {
+        window.location.href = $(this).attr('href');
+        init.initall();
+    });
+    $(document).on('click', '.read', function () {
+        var url = $(this).attr('href');
+        layui.use('layer', function () {
+            var layer = layui.layer;
+            layer.open({
+                type: 2,
+                title: '查看资料',
+                shadeClose: true,
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['90%', '60%'],
+                content: url
+            });
+        });
+        return false;
+    });
+</script>

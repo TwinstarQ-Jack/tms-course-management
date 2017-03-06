@@ -1,0 +1,222 @@
+<include file="./Public/Webform/Nav/header.html" title="用户中心" />
+<div id="wrapper">
+    <include file="./Public/Webform/Nav/topnav.html" actuser="layui-this"/>
+    <include file="./Public/Webform/User/leftnav.html" actindex="class=layui-this"/>
+    <div class="layui-tab layui-tab-brief tab-div-withnav" lay-filter="usertab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">作业与课程公告</li>
+            <li>历史消息</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                    <legend>课程相关与作业提醒</legend>
+                </fieldset>
+                <div id="user-course-status" style="padding-top: 20px;">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="panel panel-red">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-user fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="huge" id="userindex-ufhw">n/a</div>
+                                        <div>未完成个人作业</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="/user/homework">
+                                <div class="panel-footer">
+                                    <span class="pull-left">查看详细</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="panel panel-green">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-group fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="huge" id="userindex-ufgw">n/a</div>
+                                        <div>未完成小组作业</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="/user/group">
+                                <div class="panel-footer">
+                                    <span class="pull-left">查看详细</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 layui-hide">
+                        <div class="panel panel-yellow">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-star fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="huge" id="userindex-creditnum">n/a</div>
+                                        <div>课程贡献值</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#" id="getcreditships">
+                                <div class="panel-footer">
+                                    <span class="pull-left">如何获取？</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div style="clear: both; height: 1px;"></div>
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                    <legend>课程公告</legend>
+                </fieldset>
+                <div class="panel-footer div-footer-pages">
+                    <div id="user-index-pagecur"></div>
+                </div>
+                <blockquote class="layui-elem-quote layui-hide" id="user-index-no-announce">
+                    暂时还没有公告
+                </blockquote>
+                <div id="user-index-showcur">
+                    <blockquote class="layui-elem-quote">
+                        <div class="quote-content">
+                            已发布xxxx
+                        </div>
+                        <div class="quote-footer">
+                            <i class="glyphicon glyphicon-user"></i> 系统
+                            <span class="quote-push-time"><i class="glyphicon glyphicon-time"></i> 2016.08.12 03:56</span>
+                        </div>
+                    </blockquote>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                    <legend>历史课程公告</legend>
+                </fieldset>
+                <div class="panel-footer div-footer-pages">
+                    <div id="user-index-pagehis"></div>
+                </div>
+                <blockquote class="layui-elem-quote layui-hide" id="user-index-no-history">
+                    暂时还没有历史公告
+                </blockquote>
+                <div id="user-index-showhis">
+                    <blockquote class="layui-elem-quote">
+                        <div class="quote-content">
+                            已发布xxxx
+                        </div>
+                        <div class="quote-footer">
+                            <i class="glyphicon glyphicon-user"></i> 系统
+                            <span class="quote-push-time"><i class="glyphicon glyphicon-time"></i> 2016.08.12 03:56</span>
+                        </div>
+                    </blockquote>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/User/footer.html" />
+<script>
+    $(document).ready(function () {
+        initIndexShowData();
+    });
+    window.onload = function () {
+        $.post(user_api.anno_pages, {'mode': "current"}, function (r) {
+            if(r.status == 1){
+                pagelist(location.hash.replace('#!pagecur=', '') || 1, r.data, 'current');
+            }
+            if(r.status == 0){
+                msg.show('获取当前分页总数失败');
+                exit();
+            }
+        },'JSON');
+        $.post(user_api.anno_pages, {'mode': "history"}, function (r) {
+            if(r.status == 1){
+                pagelist(location.hash.replace('#!pagehis=', '') || 1, r.data, 'history');
+            }
+            if(r.status == 0){
+                msg.show('获取历史分页总数失败');
+                exit();
+            }
+        },'JSON');
+    };
+    function pagelist(curr, pages, mode) {
+        var query = {"page": parseInt(curr) || 1, "mode": mode};
+        $.post(user_api.anno_list, query, function (r) {
+            if(r.status == 0){
+                msg.show(r.message);
+                exit();
+            }
+            if(r.status == 1){
+                var divbody = null;
+                if(mode == "current"){
+                    divbody = $('#user-index-showcur');
+                }
+                if(mode == "history"){
+                    divbody = $('#user-index-showhis');
+                }
+                divbody.html("");
+                if(r.data.length == 0){
+                    if(mode == "current"){
+                        $('#user-index-no-announce').removeClass('layui-hide');
+                    }
+                    if(mode == "history"){
+                        $('#user-index-no-history').removeClass('layui-hide');
+                    }
+                } else{
+                    var data = r.data;
+                    $.each(data, function (index, record) {
+                        divbody.append($('<blockquote class="layui-elem-quote"/>')
+                            .append($('<div class="quote-content"/>').html("#"+record.annoid+"<br />"+record.annomessages+"<br />参考链接："+record.annotourl))
+                            .append($('<div class="quote-footer"/>').html('<i class="glyphicon glyphicon-user"></i>'
+                                +record.annoname + '<span class="quote-push-time"><i class="glyphicon glyphicon-time"></i>'
+                                +record.annotime + '<span class="quote-push-time"><i class="glyphicon glyphicon-alert"></i>'
+                                +record.annodeadline +'</span>'))
+                        );
+                    });
+                }
+            }
+        },'JSON');
+        layui.use('laypage', function(){
+            var laypage = layui.laypage;
+            var cont = null;
+            var hash = null;
+            if(mode == "current"){
+                cont = 'user-index-pagecur';
+                hash = 'pagecur';
+            }
+            if(mode == "history"){
+                cont = 'user-index-pagehis';
+                hash = 'pagehis';
+            }
+            laypage({
+                cont: cont
+                ,pages: pages
+                ,curr: curr//获取hash值为fenye的当前页
+                ,hash: hash //自定义hash值
+                ,jump: function (e, first) {
+                    if(!first){
+                        pagelist(e.curr, e.pages, mode);
+                    }
+                },
+                skip: true
+            });
+        });
+    }
+</script>

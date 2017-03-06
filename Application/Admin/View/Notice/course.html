@@ -1,0 +1,117 @@
+<include file="./Public/Webform/Nav/header.html" title="课程公告" />
+<link href="/Public/css/table-bootstrap.min.css" rel="stylesheet" type="text/css">
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" actnotcou="class=layui-this"/>
+    <div class="tab-div-withnav">
+        <div class="panel panel-default div-navtop"><div class="panel-heading">
+            您现在所处位置：
+            <span class="layui-breadcrumb">
+                <a href="/admin">后台首页</a>
+                <a href="/admin/notice/course">课程公告</a>
+            </span>
+        </div></div>
+        <div class="div-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="div-area-funcbtn">
+                        <a class="layui-btn" id="admin-notice-add">
+                            <i class="layui-icon">&#xe61f;</i> 添加新公告
+                        </a>
+                        <a class="layui-btn layui-btn-primary" id="admin-refresh">
+                            <i class="layui-icon">&#x1002;</i> 刷新
+                        </a>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead><tr>
+                            <td>#</td>
+                            <td>内容</td>
+                            <td>发布人</td>
+                            <td>发布时间</td>
+                            <td>截止时间</td>
+                            <td>操作</td>
+                        </tr></thead>
+                        <tbody id="admin-course-showlist">
+                        <tr>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>
+                                <a class="layui-btn td-btn"><i class="layui-icon">&#xe642;</i></a>
+                                <a class="layui-btn layui-btn-danger td-btn"><i class="layui-icon">&#x1006;</i></a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="panel-footer div-footer-pages">
+                        <div id="admin-course-pager"></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    $(document).ready(function () {
+        $.post(admin_api.notice_pages, null, function (r) {
+            if(r.status == 1){
+                pagelist(location.hash.replace('#!page=', '') || 1, r.data);
+            }
+            if(r.status == 0){
+                msg.show('获取分页总数失败');
+                exit();
+            }
+        },'JSON');
+
+    });
+    function pagelist(curr, pages) {
+        var query = {"page": parseInt(curr) || 1};
+        $.post(admin_api.notice_list, query, function (r) {
+            if(r.status == 0){
+                msg.show('获取列表数据失败');
+                exit();
+            }
+            if(r.status == 1){
+                var tbody = $("#admin-course-showlist");
+                tbody.html("");
+                var data = r.data;
+                $.each(data, function (index, record) {
+                    tbody.append($('<tr/>')
+                        .append($('<td/>').html(record.annoid))
+                        .append($('<td/>').html(record.annomessages))
+                        .append($('<td/>').html(record.annoname))
+                        .append($('<td/>').html(record.annotime))
+                        .append($('<td/>').html(record.annodeadline))
+                        .append($('<td/>').html('<a class="layui-btn td-btn" href="/admin/notice/add#;id='+record.annoid
+                            +'"><i class="layui-icon">&#xe642;</i></a>'
+                            +'<a class="layui-btn layui-btn-danger td-btn" href="/admin/notice/add#;id='+record.annoid
+                            +';del=1"><i class="layui-icon">&#x1006;</i></a>'))
+                    );
+                });
+            }
+        },'JSON');
+        layui.use('laypage', function(){
+            var laypage = layui.laypage;
+            laypage({
+                cont: 'admin-course-pager'
+                ,pages: pages
+                ,curr: curr//获取hash值为fenye的当前页
+                ,hash: 'page' //自定义hash值
+                ,jump: function (e, first) {
+                    if(!first){
+                        pagelist(e.curr, e.pages);
+                    }
+                },
+                skip: true
+            });
+        });
+    }
+</script>

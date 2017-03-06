@@ -1,0 +1,50 @@
+    <div class="layui-side layui-bg-black nav-sidebar">
+        <div class="layui-side-scroll">
+            <ul class="layui-nav layui-nav-tree" lay-filter="lefttree">
+                <li class="layui-nav-item [actindex]">
+                    <a href="/admin"><i class="fa fa-exclamation-circle fa-fw"></i> 后台功能介绍</a>
+                </li>
+                <li class="layui-nav-item [actsetterm]">
+                    <a href="/admin/index/setgrade"><i class="fa fa-sign-in fa-fw"></i> 设置上课年级</a>
+                </li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="javascript:;" href="javascript:;">通知公告</a>
+                    <dl class="layui-nav-child">
+                        <dd [actnotcou]><a href="/admin/notice/course"><i class="fa fa-bullhorn fa-fw"></i> 课程公告</a></dd>
+                        <dd [actnotsen]><a href="/admin/notice/sendmsg"><i class="fa fa-quote-left fa-fw"></i> 发送提醒</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="javascript:;" href="javascript:;">学生管理</a>
+                    <dl class="layui-nav-child">
+                        <dd [actusrmgr]><a href="/admin/user/manager"><i class="fa fa-cog fa-fw"></i> 成员管理</a></dd>
+                        <dd [actgromgr]><a href="/admin/user/group"><i class="fa fa-users fa-fw"></i> 小组管理</a></dd>
+                        <dd [actusrcod]><a href="/admin/user/code"><i class="fa fa-qrcode fa-fw"></i> 添加授权码</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="javascript:;" href="javascript:;">主题维护</a>
+                    <dl class="layui-nav-child">
+                        <dd [actthmnct]><a href="/admin/theme/newchapter"><i class="fa fa-list fa-fw"></i> 添加新章</a></dd>
+                        <dd [actthmmgr]><a href="/admin/theme/manager"><i class="fa fa-refresh fa-fw"></i> 管理课程</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="javascript:;" href="javascript:;">作业管理</a>
+                    <dl class="layui-nav-child">
+                        <dd [actthmnth]><a href="/admin/theme/newtheme"><i class="fa fa-tasks fa-fw"></i> 添加新主题（作业）</a></dd>
+                        <dd [acthwmmgr]><a href="/admin/hw/manager"><i class="fa fa-rotate-right fa-fw"></i> 管理主题</a></dd>
+                        <dd [acthwgrou]><a href="/admin/hw/grouplist"><i class="fa fa-user fa-fw"></i> 小组作业状态</a></dd>
+                        <dd [acthwpers]><a href="/admin/hw/personlist"><i class="fa fa-graduation-cap fa-fw"></i> 个人作业状态</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="javascript:;" href="javascript:;">资源管理</a>
+                    <dl class="layui-nav-child">
+                        <dd [actresnew]><a href="/admin/resource/newfile"><i class="fa fa-file-o fa-fw"></i> 上传新资源</a></dd>
+                        <dd [actresmag]><a href="/admin/resource/manager"><i class="fa fa-wrench fa-fw"></i> 管理现有资源</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>

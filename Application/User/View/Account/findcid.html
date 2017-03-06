@@ -1,0 +1,19 @@
+<include file="./Public/Webform/Nav/header.html" title="查找用户学号" />
+<div class="layui-form layui-form-pane" style="padding-top: 20px;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-inline">
+            <input class="layui-input" type="text" name="user-account-name" placeholder="RealName" />
+        </div>
+    </div>
+    <div>
+        <a class="layui-btn" href="javascript:;" id="user-account-addsubmit">
+            <i class="layui-icon">&#x1005;</i> 查找
+        </a>
+    </div>
+</div>
+<div class="panel panel-default" style="margin-top: 30px;">
+    <div class="panel-heading">查询结果</div>
+    <div class="panel-body" id="user-account-queryrst"></div>
+</div>
+<include file="./Public/Webform/User/footer.html" />

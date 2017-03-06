@@ -1,0 +1,153 @@
+<include file="./Public/Webform/Nav/header.html" title="管理课程" />
+<link href="/Public/css/table-bootstrap.min.css" rel="stylesheet" type="text/css">
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" actthmmgr="class=layui-this"/>
+    <div class="tab-div-withnav">
+        <div class="panel panel-default div-navtop"><div class="panel-heading">
+            您现在所处位置：
+            <span class="layui-breadcrumb">
+                <a href="/admin">后台首页</a>
+                <a href="/admin/theme/manager">管理课程</a>
+            </span>
+        </div></div>
+        <div class="div-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <form class="div-area-funcbtn layui-form layui-form-pane">
+                        <label class="layui-form-label">上课年级</label>
+                        <div class="layui-input-inline">
+                            <select name="rgrade" lay-filter="grade"></select>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive">
+                    <input type="hidden" name="selectcid" value>
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead><tr>
+                            <td>#</td>
+                            <td>标题</td>
+                            <td>发布人</td>
+                            <td>介绍</td>
+                            <td>发布时间</td>
+                            <td>操作</td>
+                        </tr></thead>
+                        <tbody id="admin-theme-showlist">
+                        <tr>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>
+                                <a class="layui-btn layui-btn-danger td-btn"><i class="layui-icon">&#x1006;</i></a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="panel-footer div-footer-pages">
+                        <div id="admin-theme-pager"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    $(document).ready(function () {
+        loading.show();
+        var grade = 2014;
+        $.post(admin_api.nowgrade_get, null, function (r) {
+            if(r.status == 1){
+                init_grade(r.data);
+            }
+            if(r.status == 0){
+                msg.show(r.message);
+            }
+        },'JSON');
+        layui.use('form', function () {
+            var form = layui.form();
+            form.on('select(grade)', function () {
+                grade = $('select[name="rgrade"]').val();
+                $.post(admin_api.theme_chapter_pages, {'grade':grade}, function (r) {
+                    if(r.status == 1){
+                        pagelist(1, r.data, grade);
+                    }
+                    if(r.status == 0){
+                        loading.end();
+                        msg.show('获取分页总数失败');
+                        exit();
+                    }
+                },'JSON');
+            });
+            form.render();
+        });
+        //首次进入页面初始化
+        $.post(admin_api.theme_chapter_pages, {'grade':grade}, function (r) {
+            if(r.status == 1){
+                pagelist(location.hash.replace('#!page=', '') || 1, r.data, grade);
+            }
+            if(r.status == 0){
+                loading.end();
+                msg.show('获取分页总数失败');
+                exit();
+            }
+        },'JSON');
+    });
+    function init_grade(year) {
+        var mydate = new Date();
+        var thisyear = mydate.getFullYear();
+        var select = $('select[name="rgrade"]');
+        for(var i = 2014; i <= (thisyear-2); i++) {
+            select.append("<option value="+i+">"+i+"</option>");
+        }
+        select.val(year);
+    }
+    function pagelist(curr, pages, grade) {
+        var query = {"page": parseInt(curr) || 1, "grade":grade};
+        $.post(admin_api.theme_chapter_list , query, function (r) {
+            loading.end();
+            if(r.status == 0){
+                msg.show('获取列表数据失败');
+                exit();
+            }
+            if(r.status == 1){
+                var tbody = $("#admin-theme-showlist");
+                tbody.html("");
+                var data = r.data;
+                $.each(data, function (index, record) {
+                    tbody.append($('<tr/>')
+                        .append($('<td/>').html(record.chapterid))
+                        .append($('<td/>').html(record.showname))
+                        .append($('<td/>').html(record.creatorid))
+                        .append($('<td/>').html(record.chintro))
+                        .append($('<td/>').html(record.createtime))
+                        .append($('<td/>').html('<a class="layui-btn td-btn" href="/admin/theme/newchapter#;id='+record.chapterid
+                            +';edit=1"><i class="layui-icon">&#xe614;</i></a>'+
+                            '<a class="layui-btn layui-btn-danger td-btn" href="/admin/theme/newchapter#;id='+record.chapterid
+                            +';del=1"><i class="layui-icon">&#x1006;</i></a>'))
+                    );
+                });
+            }
+        },'JSON');
+        layui.use('laypage', function(){
+            var laypage = layui.laypage;
+            laypage({
+                cont: 'admin-theme-pager'
+                ,pages: pages
+                ,curr: curr//获取hash值为fenye的当前页
+                ,hash: 'page' //自定义hash值
+                ,jump: function (e, first) {
+                    if(!first){
+                        loading.show();
+                        pagelist(e.curr, e.pages, grade);
+                    }
+                },
+                skip: true
+            });
+        });
+    }
+
+</script>

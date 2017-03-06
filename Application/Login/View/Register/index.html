@@ -1,0 +1,85 @@
+<include file="./Public/Webform/Nav/header.html" title="注册" />
+<div id="wrapper">
+    <include file="./Public/Webform/Nav/topnav.html"/>
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+        <legend>注册新账号</legend>
+    </fieldset>
+    <div class="loginbox">
+        <form class="layui-form layui-form-pane" id="logincheck" method="post">
+            <div class="layui-form-item">
+                <label class="layui-form-label">学号</label>
+                <div class="layui-input-inline">
+                    <input placeholder="Card Number" name="rcardaccount" type="text" class="layui-input" autofocus />
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <a href="/login">已有账号？</a>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-input-inline">
+                    <input placeholder="Login Password" name="rpassword" type="password" class="layui-input" />
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    请控制在6-16位内
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">重复密码</label>
+                <div class="layui-input-inline">
+                    <input placeholder="Check Password" name="rpassword2" type="password" class="layui-input" />
+                </div>
+            </div>
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+                <legend>学生相关信息</legend>
+            </fieldset>
+            <div class="layui-form-item">
+                <label class="layui-form-label">真实姓名</label>
+                <div class="layui-input-inline">
+                    <input placeholder="Real Name" name="rname" type="text" class="layui-input" />
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    请填写真实姓名，以便讨论时识别身份以及进行作业登记
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">年级</label>
+                <div class="layui-input-inline">
+                    <select name="rgrade" lay-verify="required">
+                        <option value="" selected="selected">请选择</option>
+                    </select>
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    年级为4位数，默认为学号前4位
+                </div>
+            </div>
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+                <legend>找回账号相关信息</legend>
+            </fieldset>
+            <div class="layui-form-item">
+                <label class="layui-form-label">问题</label>
+                <div class="layui-input-inline">
+                    <input placeholder="FindPsw Question" name="rquestion" type="text" class="layui-input" />
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    用于忘记密码时作为确认的问题，请控制在20个字内
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">答案</label>
+                <div class="layui-input-inline">
+                    <input placeholder="FindPsw Answer" name="ranswer" type="text" class="layui-input" />
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    用于忘记密码时作为确认的问题答案，请控制在20个字内
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <a class="layui-btn" style="width:100px;" onclick="register.check();">注册</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<include file="./Public/Webform/Nav/footer.html" />
+<script src="/Public/js/login.js"></script>

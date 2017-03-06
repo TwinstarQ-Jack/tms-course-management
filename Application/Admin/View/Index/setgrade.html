@@ -1,0 +1,66 @@
+<include file="./Public/Webform/Nav/header.html" title="设置当前上课年级" />
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" actsetterm="layui-this"/>
+
+    <div class="tab-div-withnav">
+        <div class="panel panel-default div-navtop"><div class="panel-heading">
+            您现在所处位置：
+            <span class="layui-breadcrumb">
+                <a href="/admin">后台首页</a>
+                <a href="/admin/index/setgrade">设置上课年级</a>
+            </span>
+        </div></div>
+        <div class="div-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <input type="hidden" id="rchangestate" value="0"/>
+                    <div class="layui-form layui-form-pane" style="padding-top: 20px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">当前年级</label>
+                            <div class="layui-input-inline">
+                                <select name="rgrade" lay-verify="required">
+                                    <option value="" selected="selected">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer div-footer-pages">
+                        <div>
+                            <a class="layui-btn" href="javascript:;" id="admin-index-change">
+                                <i class="layui-icon">&#x1005;</i> 修改
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    function init_grade() {
+        var mydate = new Date();
+        var thisyear = mydate.getFullYear();
+        var select = $('select[name="rgrade"]');
+        for(var i = 2014; i <= (thisyear-2); i++) {
+            select.append("<option value="+i+">"+i+"</option>");
+        }
+    };
+    $(document).ready(function () {
+        init_grade();
+        $.post(admin_api.nowgrade_get, null, function (r) {
+            if(r.status == 1){
+                $('select[name="rgrade"]').val(r.data);
+                layui.use('form', function () {
+                   var form = layui.form();
+                   form.render();
+                });
+            }
+            if(r.status == 0){
+                msg.show(r.message);
+            }
+        },'JSON');
+    });
+</script>

@@ -1,0 +1,158 @@
+<include file="./Public/Webform/Nav/header.html" title="增加系统用户" />
+<link href="/Public/css/table-bootstrap.min.css" rel="stylesheet" type="text/css">
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" actusrmgr="class=layui-this"/>
+    <div class="tab-div-withnav">
+        <div class="panel panel-default div-navtop"><div class="panel-heading">
+            您现在所处位置：
+            <span class="layui-breadcrumb">
+                <a href="/admin">后台首页</a>
+                <a href="/admin/user/manager">成员管理</a>
+                <a href="/admin/user/adduser">添加/修改成员</a>
+            </span>
+        </div></div>
+        <div class="div-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="div-area-funcbtn">
+                        <a class="layui-btn layui-btn-primary" href="/admin/user/manager">
+                            <i class="layui-icon">&#xe603;</i> 返回
+                        </a>
+                    </div>
+                    <div class="layui-form layui-form-pane" id="logincheck" style="margin-top: 20px;">
+                        <input type="hidden" id="rchangestate" value="0"/>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">一卡通卡号</label>
+                            <div class="layui-input-inline">
+                                <input placeholder="Card Number" name="rcardaccount" type="text" class="layui-input" autofocus />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">密码</label>
+                            <div class="layui-input-inline">
+                                <input placeholder="Login Password" name="rpassword" type="password" class="layui-input" />
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                请控制在6-16位内（不修改请留空）
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">重复密码</label>
+                            <div class="layui-input-inline">
+                                <input placeholder="Check Password" name="rpassword2" type="password" class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">权限</label>
+                            <div class="layui-input-block">
+                                <input type="radio" name="root" value="0" title="普通用户" checked="checked" />
+                                <input type="radio" name="root" value="1" title="教师" />
+                                <input type="radio" name="root" value="2" title="助教" />
+                                <input type="radio" name="root" value="-1" title="封禁" />
+                                <input type="radio" name="root" value="3" title="管理员" disabled="disabled" />
+                            </div>
+                        </div>
+                        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+                            <legend>学生相关信息</legend>
+                        </fieldset>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">真实姓名</label>
+                            <div class="layui-input-inline">
+                                <input placeholder="Real Name" name="rname" type="text" class="layui-input" />
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                请填写真实姓名，以便讨论时识别身份以及进行作业登记
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">年级</label>
+                            <div class="layui-input-inline">
+                                <select name="rgrade" lay-verify="required">
+                                    <option value="" selected="selected">请选择</option>
+                                </select>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                年级为4位数，默认为学号前4位
+                            </div>
+                        </div>
+                        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+                            <legend>找回账号相关信息</legend>
+                        </fieldset>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">问题</label>
+                            <div class="layui-input-inline">
+                                <input placeholder="FindPsw Question" name="rquestion" type="text" class="layui-input" />
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                用于忘记密码时作为确认的问题，请控制在20个字内（不修改请留空）
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">答案</label>
+                            <div class="layui-input-inline">
+                                <input placeholder="FindPsw Answer" name="ranswer" type="text" class="layui-input" />
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                用于忘记密码时作为确认的问题答案，请控制在20个字内（不修改请留空）
+                            </div>
+                        </div>
+                </div>
+                    <div class="panel-footer div-footer-pages">
+                        <div>
+                            <a class="layui-btn" href="javascript:;" id="admin-user-addusersubmit">
+                                <i class="layui-icon">&#x1005;</i> 提交
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    function init_grade() {
+        var mydate = new Date();
+        var thisyear = mydate.getFullYear();
+        var select = $('select[name="rgrade"]');
+        for(var i = 2014; i <= (thisyear-2); i++) {
+            select.append("<option value="+i+">"+i+"</option>");
+        }
+    };
+    function initChange(cid) {
+        $.post(admin_api.user_mgr_read, {"cid": cid}, function (r) {
+            if(r.status == 1){
+                var data = r.data;
+                $('input[name="rcardaccount"]').val(data['cardid']);
+                $('input[name="rcardaccount"]').attr('disabled', 'disabled');
+                $('input[name="rname"]').val(data['name']);
+                $('select[name="rgrade"]').val(data['grade']);
+                var rank = data['rootrank'];
+                switch(rank){
+                    case '1': $('input[name="root"]').eq(1).attr("checked", true);break;
+                    case '2': $('input[name="root"]').eq(2).attr("checked", true);break;
+                    case '3': $('input[name="root"]').eq(4).attr("checked", true);break;
+                    case '-1': $('input[name="root"]').eq(3).attr("checked", true);break;
+                }
+                $('#rchangestate').val(1);
+                layui.use('form', function () {
+                    var form = layui.form();
+                    form.render();
+                });
+            }
+            if(r.status == 0){
+                msg.show("获取"+ cid + "用户信息失败");
+            }
+        },'JSON');
+    }
+    $(document).ready(function () {
+        init_grade();
+    });
+    window.onload = function () {
+        if($.hash("cid")){
+            initChange($.hash("cid"));
+        };
+    }
+</script>

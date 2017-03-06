@@ -1,0 +1,153 @@
+<include file="./Public/Webform/Nav/header.html" title="添加新章" />
+<link href="/Public/css/table-bootstrap.min.css" rel="stylesheet" type="text/css">
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" actthmnct="class=layui-this"/>
+    <div class="tab-div-withnav">
+        <div class="panel panel-default div-navtop"><div class="panel-heading">
+            您现在所处位置：
+            <span class="layui-breadcrumb">
+                <a href="/admin">后台首页</a>
+                <a href="/admin/theme/newchapter">添加新章</a>
+            </span>
+        </div></div>
+        <div class="div-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <input type="hidden" name="rchangestate" value="0"/>
+                    <div class="layui-form layui-form-pane" style="padding-top: 20px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">章节标题名</label>
+                            <div class="layui-input-block">
+                                <input class="layui-input" required lay-verify="required" type="text" name="showname" placeholder="Chapter Name" />
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                该字段为必填字段
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">英文标题名</label>
+                            <div class="layui-input-block">
+                                <input class="layui-input" type="text" name="engname" placeholder="Chapter English Name" />
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                选填
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">介绍</label>
+                            <div class="layui-input-block">
+                                <textarea class="layui-input" type="text" name="chintro" placeholder="Chapter Introduction in Chinese" style="height: 100px;"></textarea>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                选填，如需要换行，请在需要换行处添加标记：&lt;br /&gt;
+                            </div>
+                        </div>
+                </div>
+                    <div class="panel-footer div-footer-pages">
+                        <div>
+                            <a class="layui-btn" href="javascript:;" id="admin-theme-addsubmit">
+                                <i class="layui-icon">&#x1005;</i> 提交
+                            </a>
+                            <a class="layui-btn layui-hide" href="javascript:;" id="admin-theme-save">
+                                <i class="layui-icon">&#x1005;</i> 保存
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    $('#admin-theme-addsubmit').click(function () {
+        loading.show();
+        var chname = $('input[name="showname"]').val();
+        var engname = $('input[name="engname"]').val();
+        var intro = $('textarea[name="chintro"]').val();
+        public.isnull(chname, '主题标题名');
+        var send = {'chname':chname, 'engname':engname, 'intro':intro};
+        $.post(admin_api.theme_chapter_add, send, function (r) {
+            if(r.status == 0){
+                return dialog.error(r.message);
+            }
+            if(r.status == 1){
+                return dialog.success(r.message, '/admin/theme/manager');
+            }
+            loading.end();
+        },"JSON");
+    });
+    $('#admin-theme-save').click(function () {
+        loading.show();
+        var cid = $('input[name="rchangestate"]').val();
+        var chname = $('input[name="showname"]').val();
+        var engname = $('input[name="engname"]').val();
+        var intro = $('textarea[name="chintro"]').val();
+        public.isnull(cid, '主题索引');
+        public.isnull(chname, '主题标题名');
+        var send = {'cid':cid, 'chname':chname, 'engname':engname, 'intro':intro};
+        $.post(admin_api.theme_chapter_save, send, function (r) {
+            if(r.status == 0){
+                return dialog.error(r.message);
+            }
+            if(r.status == 1){
+                return dialog.success(r.message, '/admin/theme/manager');
+            }
+            loading.end();
+        },"JSON");
+    });
+    function init_edit(cid) {
+        loading.end();
+        $.post(admin_api.theme_chapter_content, {'cid':cid}, function (r) {
+            if(r.status == 0){
+                return dialog.errorto(r.message, '/admin/theme/manager');
+            }
+            if(r.status == 1){
+                var data = r.data;
+                $('input[name="showname"]').val(data.showname);
+                $('input[name="engname"]').val(data.engname);
+                $('textarea[name="chintro"]').val(data.chintro);
+                $('input[name="rchangestate"]').val($.hash('id'));
+                $('#admin-theme-addsubmit').addClass('layui-hide');
+                $('#admin-theme-save').removeClass('layui-hide');
+                return msg.show('获取成功');
+            }
+        },"JSON");
+    }
+    $(document).ready(function () {
+        var cid = $.hash('id');
+        var del = $.hash('del');
+        var edit = $.hash('edit');
+        if(edit == 1) {
+            loading.show();
+            init_edit(cid);
+        } else if(del == 1) {
+            layui.use('layer', function () {
+                var layer = layui.layer;
+                layer.open({
+                    skin: 'layui-layer-molv',
+                    content : '是否确定删除编号为'+cid+'的章？删除后无法恢复',
+                    icon: 3,
+                    btn : ['是','否'],
+                    yes : function(){
+                        loading.show();
+                        $.post(admin_api.theme_chapter_del, {'cid':cid}, function (r) {
+                            loading.end();
+                            if(r.status == 0) {
+                                return dialog.errorto(r.message, '/admin/theme/manager')
+                            }
+                            if(r.status == 1) {
+                                return dialog.success(r.message, '/admin/theme/manager')
+                            }
+                        },"JSON");
+                    },
+                    btn2 : function () {
+                        location.href = '/admin/theme/manager';
+                    },
+                });
+            });
+        }
+    });
+</script>

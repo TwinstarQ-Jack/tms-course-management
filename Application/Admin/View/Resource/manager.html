@@ -1,0 +1,156 @@
+<include file="./Public/Webform/Nav/header.html" title="管理现有资源" />
+<link href="/Public/css/table-bootstrap.min.css" rel="stylesheet" type="text/css">
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" actresmag="class=layui-this"/>
+    <div class="tab-div-withnav">
+        <div class="panel panel-default div-navtop"><div class="panel-heading">
+            您现在所处位置：
+            <span class="layui-breadcrumb">
+                <a href="/admin">后台首页</a>
+                <a href="/admin/resource/manager">管理资源</a>
+            </span>
+        </div></div>
+        <div class="div-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <form class="div-area-funcbtn layui-form layui-form-pane">
+                        <label class="layui-form-label">选择专题</label>
+                        <div class="layui-input-block">
+                            <select name="cid" lay-filter="cid">
+                                <option value="">请选择： eg.2014001 - TMS</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive">
+                    <input type="hidden" name="selectcid" value>
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead><tr>
+                            <td>#</td>
+                            <td>文件标题</td>
+                            <td>发布人</td>
+                            <td>介绍</td>
+                            <td>发布时间</td>
+                            <td>操作</td>
+                        </tr></thead>
+                        <tbody id="admin-resource-showlist">
+                        <tr>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>
+                                <a class="layui-btn layui-btn-danger td-btn"><i class="layui-icon">&#x1006;</i></a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="panel-footer div-footer-pages">
+                        <div id="admin-resource-pager"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    $(document).ready(function () {
+        loading.show();
+        $('input[name="selectcid"]').val($.hash('cid') || 2014001);
+        var cid = $('input[name="selectcid"]').val();
+        layui.use('form', function () {
+            var form = layui.form();
+            $.post(admin_api.theme_chapter_get, null,function (r) {
+                if(r.status == 0) {
+                    loading.end();
+                    msg.show('获取章列表失败');
+                    exit();
+                }
+                if(r.status == 1) {
+                    var data = r.data;
+                    $.each(data, function (index, obj) {
+                        $('select[name="cid"]').append(
+                            '<option value='+obj.chapterid+'>'+obj.chapterid+'-'+obj.showname+'</option>'
+                        );
+                    });
+                    $('select[name="cid"]').val(cid);
+                    form.render();
+                }
+            } ,"JSON");
+            form.on('select(cid)', function () {
+                var cid = $('select[name="cid"]').val();
+                $.post(admin_api.resource_pages, {'cid':cid}, function (r) {
+                    if(r.status == 1){
+                        pagelist(1, r.data, cid);
+                    }
+                    if(r.status == 0){
+                        loading.end();
+                        msg.show('获取分页总数失败');
+                        exit();
+                    }
+                },'JSON');
+            });
+        });
+        //首次进入页面初始化
+        $.post(admin_api.resource_pages, {'cid':cid}, function (r) {
+            if(r.status == 1){
+                pagelist(location.hash.replace('#!page=', '') || 1, r.data, cid);
+            }
+            if(r.status == 0){
+                loading.end();
+                msg.show('获取分页总数失败');
+                exit();
+            }
+        },'JSON');
+    });
+
+    function pagelist(curr, pages, cid) {
+        var query = {"page": parseInt(curr) || 1,"cid": cid};
+        $.post(admin_api.resource_list , query, function (r) {
+            loading.end();
+            if(r.status == 0){
+                msg.show('获取列表数据失败');
+                exit();
+            }
+            if(r.status == 1){
+                var tbody = $("#admin-resource-showlist");
+                tbody.html("");
+                var data = r.data;
+                $.each(data, function (index, record) {
+                    tbody.append($('<tr/>')
+                        .append($('<td/>').html(record.fileid))
+                        .append($('<td/>').html(record.showname))
+                        .append($('<td/>').html(record.uploaderid))
+                        .append($('<td/>').html(record.remarks))
+                        .append($('<td/>').html(record.uploadertime))
+                        .append($('<td/>').html('<a class="layui-btn td-btn" href="'+record.filename
+                            +'"><i class="layui-icon">&#xe61e;</i></a>'+
+                            '<a class="layui-btn layui-btn-danger td-btn" href="/admin/resource/newfile#;id='+record.fileid
+                            +';del=1"><i class="layui-icon">&#x1006;</i></a>'))
+                    );
+                });
+            }
+        },'JSON');
+        layui.use('laypage', function(){
+            var laypage = layui.laypage;
+            laypage({
+                cont: 'admin-course-pager'
+                ,pages: pages
+                ,curr: curr//获取hash值为fenye的当前页
+                ,hash: 'page' //自定义hash值
+                ,jump: function (e, first) {
+                    if(!first){
+                        loading.show();
+                        pagelist(e.curr, e.pages, cid);
+                    }
+                },
+                skip: true
+            });
+        });
+    }
+
+</script>

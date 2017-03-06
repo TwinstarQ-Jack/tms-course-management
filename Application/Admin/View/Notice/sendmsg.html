@@ -1,0 +1,102 @@
+<include file="./Public/Webform/Nav/header.html" title="发送提醒" />
+<link href="/Public/css/table-bootstrap.min.css" rel="stylesheet" type="text/css">
+<div id="wrapper">
+    <include file="./Public/Webform/Admin/topnav.html"/>
+    <include file="./Public/Webform/Admin/leftnav.html" actnotsen="class=layui-this"/>
+    <div class="tab-div-withnav">
+        <div class="panel panel-default div-navtop"><div class="panel-heading">
+            您现在所处位置：
+            <span class="layui-breadcrumb">
+                <a href="/admin">后台首页</a>
+                <a href="/admin/notice/sendmsg">发送提醒</a>
+            </span>
+        </div></div>
+        <div class="div-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="layui-form layui-form-pane" style="padding-top: 20px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">查询一卡通</label>
+                            <div class="layui-input-inline">
+                                <a href="javascript:;" id="admin-sendmsg-search" class="layui-btn">点击查询</a>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                在弹出层进行查询
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">发送给</label>
+                            <div class="layui-input-inline">
+                                <input class="layui-input" type="text" name="sendmsg-sendto" placeholder="Destination Card Number" />
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                仅支持输入一卡通账号（非姓名）
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">公告内容</label>
+                            <div class="layui-input-block">
+                                <textarea class="layui-textarea layui-hide" name="content" lay-verify="content" id="admin-sendmsg-editor"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">保存内容</label>
+                            <div class="layui-input-inline">
+                                <button class="layui-btn site-layedit" data-type="content">保存编辑器内容</button>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                每次修改完内容均需要点击保存内容
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">跳转URL</label>
+                            <div class="layui-input-block">
+                                <input class="layui-input" type="text" name="sendmsg-jumpto" placeholder="Destination URL(若无，可以留空)" />
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                eg: http://tms.tqinit.com/course/3
+                            </div>
+                        </div>
+                </div>
+                    <div class="panel-footer div-footer-pages">
+                        <div>
+                            <a class="layui-btn layui-hide" href="javascript:;" id="admin-sendmsg-addsubmit">
+                                <i class="layui-icon">&#x1005;</i> 提交
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<include file="./Public/Webform/Admin/footer.html" />
+<script>
+    layui.use('layedit',function () {
+        var layedit = layui.layedit;
+        var editIndex = layedit.build('admin-sendmsg-editor', {
+            tool: ['strong', 'italic', 'underline', 'del', '|', 'face', 'link', 'unlink', '|']
+            ,height: 300
+        });
+        var active = {
+            content: function () {
+                loading.show();
+                $('#admin-sendmsg-editor').text(layedit.getContent(editIndex)); //获取编辑器内容
+                loading.end();
+                if($('#admin-sendmsg-editor').text() == "" || $('#admin-sendmsg-editor').text() == null){
+                    msg.show('您的提醒内容为空，必须填写');
+                } else{
+                    msg.show('保存完毕，现在可以提交了');
+                    $('#admin-sendmsg-addsubmit').removeClass('layui-hide');
+                }
+            },
+        };
+        $('.site-layedit').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>
